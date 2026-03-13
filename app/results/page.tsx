@@ -19,6 +19,7 @@ import ExportButtons from "@/components/ExportButtons";
 import LoadingSkeleton from "@/components/LoadingSkeleton";
 import { ArrowLeft } from "lucide-react";
 import Link from "next/link";
+import { saveHistory } from "@/lib/firestore";
 
 export default function ResultsPage() {
   const router = useRouter();
@@ -52,29 +53,18 @@ export default function ResultsPage() {
     const autoSave = async () => {
       setSaving(true);
       try {
-        const token = await getIdToken();
-        const res = await fetch("/api/history", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-          body: JSON.stringify({ result }),
-        });
-
-        if (!res.ok) throw new Error("Failed to save");
-        
+        await saveHistory(user.uid, result);
         setSaved(true);
-        console.log("[History] Automatically saved summary to history.");
+        console.log("[History] Successfully saved summary directly via Client SDK.");
       } catch (err) {
-        console.error("[History] Auto-save failed:", err);
+        console.error("[History] Direct save failed:", err);
       } finally {
         setSaving(false);
       }
     };
 
     autoSave();
-  }, [result, user, saved, saving, authLoading, getIdToken]);
+  }, [result, user, saved, saving, authLoading]);
 
   if (loading) {
     return (

@@ -1,14 +1,19 @@
-/**
- * lib/firestore.ts
- * Server-side Firestore operations for user history.
- * Uses Firebase Admin SDK – NEVER import this on the client.
- *
- * Collection structure:  users/{userId}/history/{historyId}
- */
-
-import { adminDb } from "./firebaseAdmin";
+import { 
+  collection, 
+  addDoc, 
+  getDocs, 
+  query, 
+  where, 
+  orderBy, 
+  limit, 
+  doc, 
+  deleteDoc, 
+  getDoc,
+  serverTimestamp,
+  Timestamp
+} from "firebase/firestore";
+import { db } from "./firebase";
 import type { HistoryItem, SummaryResult } from "./types";
-import { FieldValue } from "firebase-admin/firestore";
 
 const COLLECTION = "users";
 const SUBCOLLECTION = "history";
@@ -16,24 +21,21 @@ const SUBCOLLECTION = "history";
 // ─── Save ──────────────────────────────────────────────────────────────────────
 
 /**
- * Save a new summary result to a user's history.
+ * Save a new summary result to a user's history using the Client SDK.
  * Returns the newly created Firestore document ID.
  */
 export async function saveHistory(
   userId: string,
   result: SummaryResult
 ): Promise<string> {
-  const historyRef = adminDb
-    .collection(COLLECTION)
-    .doc(userId)
-    .collection(SUBCOLLECTION);
+  const historyRef = collection(db, COLLECTION, userId, SUBCOLLECTION);
 
-  const docData: Omit<HistoryItem, "id"> = {
+  const docData = {
     userId,
     videoUrl: result.videoUrl,
     videoTitle: result.videoTitle,
     thumbnailUrl: result.thumbnailUrl,
-    createdAt: new Date().toISOString(),
+    createdAt: serverTimestamp(),
     summaryLength: result.summaryLength,
     overallSummary: result.overallSummary,
     keyPoints: result.keyPoints,
@@ -41,7 +43,7 @@ export async function saveHistory(
     quiz: result.quiz,
   };
 
-  const docRef = await historyRef.add(docData);
+  const docRef = await addDoc(historyRef, docData);
   return docRef.id;
 }
 
@@ -51,50 +53,40 @@ export async function saveHistory(
  * Load all history items for a user, ordered by most recent first.
  */
 export async function getHistory(userId: string): Promise<HistoryItem[]> {
-  const snapshot = await adminDb
-    .collection(COLLECTION)
-    .doc(userId)
-    .collection(SUBCOLLECTION)
-    .orderBy("createdAt", "desc")
-    .limit(50) // Safety limit
-    .get();
+  const historyRef = collection(db, COLLECTION, userId, SUBCOLLECTION);
+  const q = query(
+    historyRef,
+    orderBy("createdAt", "desc"),
+    limit(50)
+  );
 
-  return snapshot.docs.map((doc) => ({
-    id: doc.id,
-    ...(doc.data() as Omit<HistoryItem, "id">),
-  }));
+  const snapshot = await getDocs(q);
+  
+  return snapshot.docs.map((snap) => {
+    const data = snap.data();
+    // Convert Firestore Timestamp to ISO string for compatibility with existing UI
+    let createdAt = new Date().toISOString();
+    if (data.createdAt instanceof Timestamp) {
+      createdAt = data.createdAt.toDate().toISOString();
+    }
+
+    return {
+      id: snap.id,
+      ...data,
+      createdAt,
+    } as HistoryItem;
+  });
 }
 
 // ─── Delete ────────────────────────────────────────────────────────────────────
 
 /**
  * Delete a single history item for a user.
- * Verifies the document belongs to the user before deleting.
  */
 export async function deleteHistory(
   userId: string,
   historyId: string
 ): Promise<void> {
-  const docRef = adminDb
-    .collection(COLLECTION)
-    .doc(userId)
-    .collection(SUBCOLLECTION)
-    .doc(historyId);
-
-  const doc = await docRef.get();
-
-  if (!doc.exists) {
-    throw new Error("History item not found.");
-  }
-
-  const data = doc.data();
-  if (data?.userId !== userId) {
-    throw new Error("Unauthorized: this history item does not belong to you.");
-  }
-
-  await docRef.delete();
+  const docRef = doc(db, COLLECTION, userId, SUBCOLLECTION, historyId);
+  await deleteDoc(docRef);
 }
-
-// ─── Stub for FieldValue (used in future batching) ─────────────────────────────
-
-export { FieldValue };

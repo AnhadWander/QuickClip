@@ -13,10 +13,11 @@ import { useAuth } from "@/context/AuthContext";
 import type { HistoryItem } from "@/lib/types";
 import { History, Trash2, ArrowRight, Loader2, PlayCircle, Plus } from "lucide-react";
 import toast from "react-hot-toast";
+import { getHistory, deleteHistory } from "@/lib/firestore";
 
 export default function HistoryPage() {
   const router = useRouter();
-  const { user, loading: authLoading, getIdToken } = useAuth();
+  const { user, loading: authLoading } = useAuth();
   
   const [history, setHistory] = useState<HistoryItem[]>([]);
   const [loading, setLoading] = useState(true);
@@ -30,46 +31,34 @@ export default function HistoryPage() {
       return;
     }
 
-    const fetchHistory = async () => {
+    const fetchHistoryData = async () => {
+      if (!user) return;
       try {
-        const token = await getIdToken();
-        const res = await fetch("/api/history", {
-          headers: { Authorization: `Bearer ${token}` },
-        });
-        
-        const data = await res.json();
-        if (data.success) {
-          setHistory(data.data);
-        } else {
-          toast.error("Failed to load history");
-        }
+        const historyData = await getHistory(user.uid);
+        setHistory(historyData);
       } catch (err) {
-        toast.error("Network error while loading history");
+        console.error("Failed to fetch history:", err);
+        toast.error("Failed to load history");
       } finally {
         setLoading(false);
       }
     };
 
-    fetchHistory();
-  }, [user, authLoading, router, getIdToken]);
+    fetchHistoryData();
+  }, [user, authLoading, router]);
 
   const handleDelete = async (id: string, e: React.MouseEvent) => {
     e.stopPropagation(); // prevent navigation
+    if (!user) return;
     if (!confirm("Are you sure you want to delete this summary?")) return;
 
     setDeletingId(id);
     try {
-      const token = await getIdToken();
-      const res = await fetch(`/api/history/${id}`, {
-        method: "DELETE",
-        headers: { Authorization: `Bearer ${token}` },
-      });
-
-      if (!res.ok) throw new Error("Delete failed");
-      
+      await deleteHistory(user.uid, id);
       setHistory(prev => prev.filter(item => item.id !== id));
       toast.success("Summary deleted");
-    } catch {
+    } catch (err) {
+      console.error("Delete failed:", err);
       toast.error("Failed to delete summary");
     } finally {
       setDeletingId(null);

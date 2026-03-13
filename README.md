@@ -73,13 +73,7 @@ QuickClip requires several environment variables for AI generation and history s
 2.  **Add your Gemini API Key**:
     Open the new `.env.local` file and paste your Google AI key into the `GEMINI_API_KEY` field. You can obtain a key from the [Google AI Studio](https://aistudio.google.com/).
 3.  **Configure Remaining Variables**:
-    Fill in your Firebase public credentials and OpenAI key (if using GPT-4).
-
-**Critical Note on Firebase Admin**:
-To enable user history, you must provide a `FIREBASE_SERVICE_ACCOUNT_KEY`.
-1.  Download your Service Account JSON from the Firebase Console.
-2.  Base64 encode the JSON file: `cat your-file.json | base64 | tr -d '\n'`
-3.  Paste the resulting string into the `FIREBASE_SERVICE_ACCOUNT_KEY` variable.
+    Fill in your Firebase public credentials (API Key, Project ID, etc.) found in your Firebase Console.
 
 ### 5. Firestore Rules
 Paste the following rules into the **Rules** tab of your Firestore Database to secure user history:
