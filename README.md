@@ -64,7 +64,16 @@ pip install -r requirements.txt
 ```
 
 ### 4. Configuration
-Create a `.env.local` file in the root directory and populate it with your API keys. You can use `.env.local.example` as a template.
+QuickClip requires several environment variables for AI generation and history saving.
+
+1.  **Create your local environment file**:
+    ```bash
+    cp .env.local.example .env.local
+    ```
+2.  **Add your Gemini API Key**:
+    Open the new `.env.local` file and paste your Google AI key into the `GEMINI_API_KEY` field. You can obtain a key from the [Google AI Studio](https://aistudio.google.com/).
+3.  **Configure Remaining Variables**:
+    Fill in your Firebase public credentials and OpenAI key (if using GPT-4).
 
 **Critical Note on Firebase Admin**:
 To enable user history, you must provide a `FIREBASE_SERVICE_ACCOUNT_KEY`.
