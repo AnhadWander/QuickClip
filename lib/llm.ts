@@ -242,28 +242,28 @@ function buildFinalPrompt(
     summaryLength === "brief"
       ? "3–5 short, concise sentences."
       : summaryLength === "standard"
-        ? "2 distinct paragraphs (total 6–10 sentences)."
-        : "3–4 distinct, detailed paragraphs (total 12–18 sentences). Each paragraph MUST be substantive and cover a specific section of the video.";
+        ? "2–3 distinct sections (total 8–12 sentences). Use Markdown headers (###) and bolding to make it skimmable."
+        : "5–7 distinct, in-depth sections (total 25–40 sentences). This must be a comprehensive breakdown of every major point in the 10+ minute video. Use Markdown headers (###), bolding, and bullet points within the summary string to ensure maximum readability and depth.";
 
   const keyPointCount =
-    summaryLength === "brief" ? 3 : summaryLength === "standard" ? 5 : 8;
+    summaryLength === "brief" ? 3 : summaryLength === "standard" ? 5 : 12;
 
   const quizCount =
-    summaryLength === "brief" ? 3 : summaryLength === "standard" ? 5 : 7;
+    summaryLength === "brief" ? 3 : summaryLength === "standard" ? 5 : 10;
 
   const timestampCount =
-    summaryLength === "brief" ? 3 : summaryLength === "standard" ? 5 : 8;
+    summaryLength === "brief" ? 4 : summaryLength === "standard" ? 6 : 12;
 
   return `You are an expert video summarizer for students and researchers. Analyze the following transcript (which may be a collection of segment summaries) and generate structured study notes.
 
 CRITICAL RULES — YOU MUST FOLLOW ALL OF THESE:
 1. Use ONLY information explicitly found in the transcript segments below.
 2. Do NOT use any outside knowledge or general facts about the topic.
-3. Your overallSummary MUST BE ${lengthInstruction} Use raw newline characters (\\n\\n) to separate paragraphs within the JSON string.
+3. Your overallSummary MUST BE ${lengthInstruction} Use raw newline characters (\\n\\n) to separate sections. Use Markdown formatting (headers, bolding, lists) WITHIN the JSON string value for overallSummary.
 4. Your overallSummary must cover the ENTIRE video from start to finish.
 5. Do NOT invent timestamps — all timestamps must correspond to actual [MM:SS] markers in the segments.
 6. If the transcript is unclear or incomplete, say so in the overallSummary.
-7. Return ONLY valid JSON. No markdown, no explanation, no code fences.
+7. Return ONLY valid JSON. No markdown outside the JSON, no explanation, no code fences.
 8. All quiz questions and answers must be answerable from the text alone.
 
 VIDEO TITLE: ${videoTitle}
@@ -274,7 +274,7 @@ ${transcriptText}
 Return a JSON object exactly matching this schema:
 {
   "videoTitle": "string (use the title above or extract from transcript)",
-  "overallSummary": "string (The detailed ${summaryLength} summary following the length rules above)",
+  "overallSummary": "string (The formatted ${summaryLength} summary using Markdown for readability)",
   "keyPoints": ["array of ${keyPointCount} key insight strings from the transcript"],
   "timestamps": [
     {

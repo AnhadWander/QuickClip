@@ -8,6 +8,7 @@
 import Image from "next/image";
 import type { SummaryResult } from "@/lib/types";
 import { ExternalLink, BookOpen } from "lucide-react";
+import ReactMarkdown from "react-markdown";
 
 interface Props {
   result: SummaryResult;
@@ -76,9 +77,9 @@ export default function SummaryCard({ result }: Props) {
             Summary
           </h3>
         </div>
-        <p style={{ color: "var(--color-text)", lineHeight: 1.8, fontSize: "0.97rem" }}>
-          {result.overallSummary}
-        </p>
+        <div className="markdown-content" style={{ color: "var(--color-text)", lineHeight: 1.8, fontSize: "0.97rem" }}>
+          <ReactMarkdown>{result.overallSummary}</ReactMarkdown>
+        </div>
       </div>
     </div>
   );

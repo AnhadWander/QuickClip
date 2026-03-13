@@ -19,6 +19,7 @@
     "react": "19.2.3",
     "react-dom": "19.2.3",
     "react-hot-toast": "^2.6.0",
+    "react-markdown": "^10.1.0",
     "youtube-caption-extractor": "^1.9.1",
     "youtube-captions-scraper": "^2.0.3",
     "youtube-ext": "^1.1.25",
