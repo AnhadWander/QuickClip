@@ -1,77 +1,83 @@
-# QuickClip
+# 🎬 QuickClip
 
-QuickClip is a production-ready Next.js web application that instantly turns any YouTube video into structured study notes, key insights, timestamps, and an interactive quiz. Designed for students, researchers, and lifelong learners.
-
-Built with a modern stack and refined for premium performance:
-- **Core**: [Next.js 14](https://nextjs.org/) (App Router), [TypeScript](https://www.typescriptlang.org/), [Tailwind CSS](https://tailwindcss.com/)
-- **AI Engine**: [Google Gemini Pro](https://ai.google.dev/) & [OpenAI GPT-4o](https://openai.com/) (Provider Swappable)
-- **Database & Auth**: [Firebase](https://firebase.google.com/) (Auth + Cloud Firestore)
-- **Rich Summaries**: [react-markdown](https://github.com/remarkjs/react-markdown) for beautiful AI formatting
-- **Exports**: [jsPDF](https://github.com/parallax/jsPDF) for professional PDF generation
-- **Icons**: [Lucide-React](https://lucide.dev/) for sleek modern iconography
-- **Transcripts**: Custom Python bridge using `youtube-transcript-api`
+**QuickClip** is a high-performance, AI-driven web application that transforms any YouTube video into structured study notes, key insights, interactive quizzes, and clickable timestamps. Designed for students, researchers, and power learners, it simplifies complex video content into actionable knowledge in seconds.
 
 ---
 
-## Features
+## 🚀 Key Features
 
-- **AI-Powered Summaries**: Extracts the transcript and generates grounded notes (no hallucinations).
-- **Map-Reduce for Long Videos**: Automatically chunks transcripts that exceed token limits to process any video length.
-- **Timestamps**: Clickable chips that jump straight to the exact second in the video.
-- **Interactive Quiz**: Tests your comprehension based strictly on the transcript.
-- **Export**: Download your notes as well-formatted PDF or TXT files.
-- **User History**: Sign in with Email/Password or Google to permanently save and access your past summaries.
-- **Provider Swappable**: Easily switch between Google Gemini and OpenAI simply by changing a `.env` variable.
-- **Mock Fallback**: Runs UI purely on mock data for local testing without API keys.
-
----
-
-## Architecture
-
-- **Frontend**: Next.js App Router (`app/`), React Context (`context/AuthContext.tsx`), and responsive vanilla-CSS + Tailwind design (`app/globals.css`).
-- **Backend API**: Next.js API Routes (`app/api/`) handle validation, transcript extraction, LLM generation, and database CRUD.
-- **Services layer**: `lib/` directory separates concerns (YouTube, Transcript, Chunking, LLM orchestrator, Firestore).
-- **Security**: The client has no access to LLM or Firebase Admin secrets. API routes verify the user's Firebase token before modifying Firestore history.
+*   **Deep Summarization**: Generates grounded, halluciation-free notes using Google Gemini Pro or OpenAI GPT-4.
+*   **Dynamic Depth**: Summary depth automatically scales based on video duration—a 30-minute video gets the detail it deserves.
+*   **Interactive Learning**: Test your knowledge with an AI-generated quiz based strictly on the video transcript.
+*   **Precision Timestamps**: Clickable time chips that jump you straight to the most important moments in the video.
+*   **Professional Exports**: Download your summaries as beautifully formatted PDFs or clean TXT files.
+*   **User History**: Securely save your summaries to your personal cloud history using Firebase.
+*   **Rich Formatting**: Uses Markdown rendering (headers, bolding, lists) for maximum readability.
 
 ---
 
-## Setup Instructions
+## 🛠 Tech Stack & Addons
 
-### 1. Install Dependencies
+QuickClip is built with a refined stack for speed, reliability, and visual excellence:
 
-**Node.js Dependencies:**
+*   **Frontend**: Next.js 14, TypeScript, Tailwind CSS.
+*   **Backend**: Next.js API Routes (Node.js).
+*   **AI Engine**: Google Generative AI (Gemini) & OpenAI (Swappable).
+*   **Database & Auth**: Firebase (Authentication + Cloud Firestore).
+*   **Key Libraries**:
+    *   `react-markdown`: For high-quality summary rendering.
+    *   `jsPDF`: For professional document generation.
+    *   `lucide-react`: For sleek, modern iconography.
+    *   `react-hot-toast`: For elegant user feedback.
+
+---
+
+## ⚙️ Setup & Installation
+
+Follow these steps to get QuickClip running on your local machine.
+
+### 1. Prerequisites
+*   **Node.js**: v18.x or higher
+*   **npm**: v9.x or higher
+*   **Python**: v3.9 or higher (required for transcript extraction)
+
+### 2. Install Node.js Dependencies
 ```bash
-cd QuickClip
 npm install
 ```
 
-**Python Dependencies:**
-QuickClip uses Python for transcript extraction. Ensure you have Python 3.9+ installed, then set up the virtual environment:
+### 3. Setup Python Virtual Environment
+QuickClip uses a Python bridge for reliable transcript extraction. You must set up a virtual environment and install the required dependencies:
+
 ```bash
+# Create the virtual environment
 python3 -m venv venv
-source venv/bin/activate  # On Windows: venv\Scripts\activate
+
+# Activate the virtual environment
+# On macOS/Linux:
+source venv/bin/activate
+# On Windows:
+venv\Scripts\activate
+
+# Install Python requirements
 pip install -r requirements.txt
 ```
 
-### 2. Environment Variables
+### 4. Configuration
+Create a `.env.local` file in the root directory and populate it with your API keys. You can use `.env.local.example` as a template.
 
-Copy `.env.local.example` to `.env.local`:
+**Critical Note on Firebase Admin**:
+To enable user history, you must provide a `FIREBASE_SERVICE_ACCOUNT_KEY`.
+1.  Download your Service Account JSON from the Firebase Console.
+2.  Base64 encode the JSON file: `cat your-file.json | base64 | tr -d '\n'`
+3.  Paste the resulting string into the `FIREBASE_SERVICE_ACCOUNT_KEY` variable.
 
-```bash
-cp .env.local.example .env.local
-```
-
-### 3. Firestore Security Rules
-
-Deploy or paste these rules into the Firestore "Rules" tab in the Firebase console:
-
+### 5. Firestore Rules
+Paste the following rules into the **Rules** tab of your Firestore Database to secure user history:
 ```javascript
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
-    match /{document=**} {
-      allow read, write: if false;
-    }
     match /users/{userId}/history/{historyId} {
       allow read, write: if request.auth != null && request.auth.uid == userId;
     }
@@ -79,32 +85,27 @@ service cloud.firestore {
 }
 ```
 
-### 4. Run the Application
+---
 
-```bash
-npm run dev
-```
+## 🏃 How to Run
 
-Visit `http://localhost:3000` in your browser.
+1.  Ensure your Python virtual environment is active if you've freshly opened your terminal.
+2.  Start the development server:
+    ```bash
+    npm run dev
+    ```
+3.  Open [http://localhost:3000](http://localhost:3000) in your browser.
 
 ---
 
-## Modifying the LLM Provider
+## 📖 How to Use
 
-QuickClip uses a provider-agnostic bridge (`lib/llm.ts`).
-To switch models:
-1. Change `LLM_PROVIDER` in `.env.local` to `"openai"` or `"gemini"`.
-2. Add the respective `API_KEY`.
-3. (Optional) Adjust the specific model choice via `OPENAI_MODEL` (default: gpt-4o-mini) or `GEMINI_MODEL` (default: gemini-1.5-flash).
-
----
-
-## Future Improvements
-
-1. **Caching Layer**: Cache identical summaries (by YouTube canonical video ID) in Firestore or Redis to save API costs on popular videos.
-2. **Analytics**: Add PostHog or Google Analytics to track feature usage (export hits, etc).
-3. **Alternative Transcripts**: Fallback to Whisper API or Deepgram if YouTube's auto-captions fail or are disabled.
-4. **Export formatting**: Use standard markdown exporting.
+1.  **Paste URL**: Find a YouTube video you want to summarize and paste the link into the main input field.
+2.  **Select Length**: Choose from **Brief**, **Standard**, or **Detailed** depending on how much depth you need.
+3.  **Generate**: Click "Summarize" and wait a few seconds. For very long videos, QuickClip will automatically chunk the transcript to ensure a complete summary.
+4.  **Learn**: Review your structured notes, click timestamps to watch specific parts, and take the quiz to verify your learning.
+5.  **Save & Export**: Your summary is automatically saved to your **History** (if signed in). Use the export buttons to download a PDF for offline study.
 
 ---
 
+*Built with ❤️ for the future of learning.*
