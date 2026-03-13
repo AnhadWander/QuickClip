@@ -155,20 +155,36 @@ async function callLLM(prompt: string): Promise<string> {
 async function callGemini(prompt: string): Promise<string> {
   const { GoogleGenerativeAI } = await import("@google/generative-ai");
   const apiKey = process.env.GEMINI_API_KEY;
-  if (!apiKey) throw new Error("GEMINI_API_KEY is not set.");
 
-  const genAI = new GoogleGenerativeAI(apiKey);
-  const model = genAI.getGenerativeModel({
-    model: process.env.GEMINI_MODEL || "gemini-1.5-flash",
-    generationConfig: {
-      temperature: 0.2, // Low temp for factual, grounded output
-      responseMimeType: "text/plain",
-    },
-  });
+  if (!apiKey) {
+    console.warn("[Gemini] API Key is missing from environment.");
+    throw new Error("GEMINI_API_KEY is not set.");
+  }
 
-  const result = await model.generateContent(prompt);
-  const response = result.response;
-  return response.text();
+  console.log(`[Gemini] Calling API... (Key present: ${apiKey.slice(0, 6)}... Prompt length: ${prompt.length})`);
+
+  const startTime = Date.now();
+  try {
+    const genAI = new GoogleGenerativeAI(apiKey);
+    const model = genAI.getGenerativeModel({
+      model: process.env.GEMINI_MODEL || "gemini-1.5-flash",
+      generationConfig: {
+        temperature: 0.2, // Low temp for factual, grounded output
+        responseMimeType: "text/plain",
+      },
+    });
+
+    const result = await model.generateContent(prompt);
+    const response = result.response;
+    const text = response.text();
+    const duration = Date.now() - startTime;
+
+    console.log(`[Gemini] Success! Received ${text.length} chars in ${duration}ms.`);
+    return text;
+  } catch (error: any) {
+    console.error("[Gemini] API Exception:", error.message || error);
+    throw error;
+  }
 }
 
 // ─── OpenAI Integration ────────────────────────────────────────────────────────
@@ -206,8 +222,8 @@ function buildChunkPrompt(
     summaryLength === "brief"
       ? "2–3 sentences"
       : summaryLength === "standard"
-      ? "4–6 sentences"
-      : "7–10 sentences";
+        ? "4–6 sentences"
+        : "7–10 sentences";
 
   return `You are a transcript summarizer. Your job is to summarize the following excerpt from a video transcript.
 
@@ -233,8 +249,8 @@ function buildFinalPrompt(
     summaryLength === "brief"
       ? "3–5 sentences"
       : summaryLength === "standard"
-      ? "1–2 paragraphs (6–10 sentences)"
-      : "3–4 paragraphs (12–18 sentences)";
+        ? "1–2 paragraphs (6–10 sentences)"
+        : "3–4 paragraphs (12–18 sentences)";
 
   const keyPointCount =
     summaryLength === "brief" ? 3 : summaryLength === "standard" ? 5 : 8;

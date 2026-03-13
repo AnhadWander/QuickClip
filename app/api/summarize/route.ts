@@ -52,17 +52,32 @@ export async function POST(req: NextRequest) {
 
     const metadata = await getVideoMetadata(videoId);
 
-    // ── 4. Retrieve transcript ───────────────────────────────────────────────
+    // ── 4. Retrieve or Use Provided Transcript ───────────────────────────────
 
-    let segments;
-    try {
-      segments = await getTranscript(videoId);
-    } catch (err) {
-      return NextResponse.json(
-        { success: false, error: (err as Error).message },
-        { status: 422 }
-      );
+    let segments = [];
+    if (body.rawTranscript && body.rawTranscript.trim().length > 0) {
+      console.log("[API] Using user-provided raw transcript fallback.");
+      segments = [{
+        text: body.rawTranscript.trim(),
+        start: 0,
+        duration: 0
+      }];
+    } else {
+      console.log(`[API] Fetching transcript for videoId: ${videoId}`);
+      try {
+        segments = await getTranscript(videoId);
+        console.log(`[API] Successfully retrieved ${segments.length} segments.`);
+      } catch (err) {
+        console.error("[API] Transcript retrieval error:", err);
+        return NextResponse.json(
+          { success: false, error: (err as Error).message },
+          { status: 422 }
+        );
+      }
     }
+
+    // ── 5. Generate summary via LLM ──────────────────────────────────────────
+    console.log(`[API] Dispatching to LLM (${summaryLength} summary)...`);
 
     // ── 5. Generate summary via LLM ──────────────────────────────────────────
 

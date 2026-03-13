@@ -63,6 +63,7 @@ export interface HistoryItem {
 export interface SummarizeRequest {
   url: string;
   summaryLength: SummaryLength;
+  rawTranscript?: string; // Fallback text if auto-fetch fails
 }
 
 export interface SummarizeResponse {

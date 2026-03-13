@@ -4,43 +4,44 @@
  * Uses the `youtube-transcript` npm package.
  */
 
-import { YoutubeTranscript } from "youtube-transcript";
+import { exec } from "child_process";
+import path from "path";
 import type { TranscriptSegment } from "./types";
 
 /**
  * Fetch the transcript for a given YouTube video ID.
- * Returns an array of transcript segments with text, start time (seconds), and duration.
- * Throws a descriptive error if the transcript is unavailable.
+ * Uses a Python bridge script to call youtube-transcript-api.
  */
 export async function getTranscript(videoId: string): Promise<TranscriptSegment[]> {
-  try {
-    const rawSegments = await YoutubeTranscript.fetchTranscript(videoId);
+  return new Promise((resolve, reject) => {
+    // Path to the python interpreter in the venv
+    const pythonPath = path.join(process.cwd(), "venv", "bin", "python3");
+    const scriptPath = path.join(process.cwd(), "python", "get_transcript.py");
 
-    if (!rawSegments || rawSegments.length === 0) {
-      throw new Error("Transcript is empty or unavailable for this video.");
-    }
+    exec(`"${pythonPath}" "${scriptPath}" ${videoId}`, (error, stdout, stderr) => {
+      if (error) {
+        console.error(`[getTranscript] Python error: ${stderr}`);
+        return reject(new Error("No transcript is available for this video. This may be because captions are disabled, the video is private, or the language is not supported."));
+      }
 
-    return rawSegments.map((seg) => ({
-      text: cleanTranscriptText(seg.text),
-      start: seg.offset / 1000, // convert ms to seconds
-      duration: seg.duration / 1000,
-    }));
-  } catch (err: unknown) {
-    const message = err instanceof Error ? err.message : String(err);
+      try {
+        const data = JSON.parse(stdout);
+        
+        if (data.error) {
+          return reject(new Error(data.error));
+        }
 
-    // Provide user-friendly error messages for common cases
-    if (
-      message.includes("Could not find any transcripts") ||
-      message.includes("Transcript is disabled") ||
-      message.includes("empty")
-    ) {
-      throw new Error(
-        "No transcript is available for this video. This may be because captions are disabled, the video is private, or the language is not supported."
-      );
-    }
+        if (!Array.isArray(data) || data.length === 0) {
+          return reject(new Error("Transcript is empty or unavailable for this video."));
+        }
 
-    throw new Error(`Failed to retrieve transcript: ${message}`);
-  }
+        resolve(data as TranscriptSegment[]);
+      } catch (parseError) {
+        console.error(`[getTranscript] JSON parse error: ${parseError}`);
+        reject(new Error("Failed to parse transcript data accurately."));
+      }
+    });
+  });
 }
 
 /**

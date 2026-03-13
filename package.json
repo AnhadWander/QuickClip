@@ -19,7 +19,11 @@
     "react": "19.2.3",
     "react-dom": "19.2.3",
     "react-hot-toast": "^2.6.0",
-    "youtube-transcript": "^1.2.1"
+    "youtube-caption-extractor": "^1.9.1",
+    "youtube-captions-scraper": "^2.0.3",
+    "youtube-ext": "^1.1.25",
+    "youtube-transcript": "^1.2.1",
+    "youtubei.js": "^16.0.1"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4",
