@@ -40,6 +40,8 @@ export function chunkTranscript(
     chunks.push(currentChunk.trim());
   }
 
+  printChunksForDebug(chunks);
+
   return chunks;
 }
 
@@ -71,7 +73,22 @@ export function combineChunkSummaries(summaries: string[]): string {
     .join("\n\n");
 }
 
-// ─── Helper ────────────────────────────────────────────────────────────────────
+// ─── Debug Helper ─────────────────────────────────────────────────────────────
+
+function printChunksForDebug(chunks: string[]): void {
+  console.log("\n========== CHUNK DEBUG START ==========\n");
+
+  chunks.forEach((chunk, index) => {
+    console.log(`----- CHUNK ${index + 1} / ${chunks.length} -----`);
+    console.log(`Estimated tokens: ${estimateTokens(chunk)}`);
+    console.log(chunk);
+    console.log("\n");
+  });
+
+  console.log("=========== CHUNK DEBUG END ===========\n");
+}
+
+// ─── Helper ───────────────────────────────────────────────────────────────────
 
 function formatSeconds(totalSeconds: number): string {
   const hours = Math.floor(totalSeconds / 3600);
