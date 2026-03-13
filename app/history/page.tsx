@@ -11,7 +11,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { useAuth } from "@/context/AuthContext";
 import type { HistoryItem } from "@/lib/types";
-import { History, Trash2, ArrowRight, Loader2, PlayCircle } from "lucide-react";
+import { History, Trash2, ArrowRight, Loader2, PlayCircle, Plus } from "lucide-react";
 import toast from "react-hot-toast";
 
 export default function HistoryPage() {
@@ -93,14 +93,20 @@ export default function HistoryPage() {
 
   return (
     <div className="container-app" style={{ padding: "2.5rem 1.25rem 5rem" }}>
-      <div style={{ display: "flex", alignItems: "center", gap: "0.75rem", marginBottom: "2rem" }}>
-        <div style={{ padding: "0.5rem", borderRadius: 10, background: "rgba(99,102,241,0.15)" }}>
-          <History size={20} color="var(--color-primary)" />
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "2rem", flexWrap: "wrap", gap: "1rem" }}>
+        <div style={{ display: "flex", alignItems: "center", gap: "0.75rem" }}>
+          <div style={{ padding: "0.5rem", borderRadius: 10, background: "rgba(99,102,241,0.15)" }}>
+            <History size={20} color="var(--color-primary)" />
+          </div>
+          <div>
+            <h1 style={{ fontSize: "1.5rem", fontWeight: 800, color: "var(--color-text)" }}>Your History</h1>
+            <p style={{ color: "var(--color-text-muted)", fontSize: "0.9rem" }}>Access your previously generated notes</p>
+          </div>
         </div>
-        <div>
-          <h1 style={{ fontSize: "1.5rem", fontWeight: 800, color: "var(--color-text)" }}>Your History</h1>
-          <p style={{ color: "var(--color-text-muted)", fontSize: "0.9rem" }}>Access your previously generated notes</p>
-        </div>
+        <Link href="/" className="btn-primary" style={{ textDecoration: "none", display: "flex", alignItems: "center", gap: "0.5rem" }}>
+          <Plus size={18} />
+          New Summary
+        </Link>
       </div>
 
       {history.length === 0 ? (
