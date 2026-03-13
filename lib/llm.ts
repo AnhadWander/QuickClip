@@ -218,26 +218,19 @@ function buildChunkPrompt(
   chunkText: string,
   summaryLength: SummaryLength
 ): string {
-  const lengthGuide =
-    summaryLength === "brief"
-      ? "2–3 sentences"
-      : summaryLength === "standard"
-        ? "4–6 sentences"
-        : "7–10 sentences";
-
   return `You are a transcript summarizer. Your job is to summarize the following excerpt from a video transcript.
 
 STRICT RULES:
 - Use ONLY information found in the transcript below.
 - Do NOT introduce any outside knowledge.
 - Do NOT guess or invent details.
-- If something is unclear, acknowledge it.
-- Write a plain text summary of ${lengthGuide}.
+- Preserve at least 3-5 key [MM:SS] timestamps in your summary to maintain a timeline.
+- Write a clear, dense summary of 200-400 words capturing all main points from this segment.
 
 TRANSCRIPT EXCERPT:
 ${chunkText}
 
-Write your summary now:`;
+Write your segment summary now (include [MM:SS] markers where significant topics start):`;
 }
 
 function buildFinalPrompt(
@@ -245,12 +238,12 @@ function buildFinalPrompt(
   summaryLength: SummaryLength,
   videoTitle: string
 ): string {
-  const summaryGuide =
+  const lengthInstruction =
     summaryLength === "brief"
-      ? "3–5 sentences"
+      ? "3–5 short, concise sentences."
       : summaryLength === "standard"
-        ? "1–2 paragraphs (6–10 sentences)"
-        : "3–4 paragraphs (12–18 sentences)";
+        ? "2 distinct paragraphs (total 6–10 sentences)."
+        : "3–4 distinct, detailed paragraphs (total 12–18 sentences). Each paragraph MUST be substantive and cover a specific section of the video.";
 
   const keyPointCount =
     summaryLength === "brief" ? 3 : summaryLength === "standard" ? 5 : 8;
@@ -261,25 +254,27 @@ function buildFinalPrompt(
   const timestampCount =
     summaryLength === "brief" ? 3 : summaryLength === "standard" ? 5 : 8;
 
-  return `You are an expert video summarizer for students and researchers. Analyze the following transcript and generate structured study notes.
+  return `You are an expert video summarizer for students and researchers. Analyze the following transcript (which may be a collection of segment summaries) and generate structured study notes.
 
 CRITICAL RULES — YOU MUST FOLLOW ALL OF THESE:
-1. Use ONLY information explicitly found in the transcript below.
+1. Use ONLY information explicitly found in the transcript segments below.
 2. Do NOT use any outside knowledge or general facts about the topic.
-3. Do NOT invent timestamps — all timestamps must correspond to actual [MM:SS] markers in the transcript.
-4. If the transcript is unclear or incomplete, say so in the overallSummary.
-5. Return ONLY valid JSON. No markdown, no explanation, no code fences.
-6. All quiz questions and answers must be answerable from the transcript alone.
+3. Your overallSummary MUST BE ${lengthInstruction} Use raw newline characters (\\n\\n) to separate paragraphs within the JSON string.
+4. Your overallSummary must cover the ENTIRE video from start to finish.
+5. Do NOT invent timestamps — all timestamps must correspond to actual [MM:SS] markers in the segments.
+6. If the transcript is unclear or incomplete, say so in the overallSummary.
+7. Return ONLY valid JSON. No markdown, no explanation, no code fences.
+8. All quiz questions and answers must be answerable from the text alone.
 
 VIDEO TITLE: ${videoTitle}
 
-TRANSCRIPT:
+TRANSCRIPT SEGMENTS:
 ${transcriptText}
 
 Return a JSON object exactly matching this schema:
 {
   "videoTitle": "string (use the title above or extract from transcript)",
-  "overallSummary": "string (${summaryGuide}, based ONLY on the transcript)",
+  "overallSummary": "string (The detailed ${summaryLength} summary following the length rules above)",
   "keyPoints": ["array of ${keyPointCount} key insight strings from the transcript"],
   "timestamps": [
     {

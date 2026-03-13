@@ -48,7 +48,7 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // ── 3. Fetch video metadata (title, thumbnail) ───────────────────────────
+    // ── 3. Fetch video metadata (title, thumbnail) ───z────────────────────────
 
     const metadata = await getVideoMetadata(videoId);
 

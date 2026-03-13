@@ -6,8 +6,8 @@
 
 import type { TranscriptSegment } from "./types";
 
-// Approximate token limit per chunk (conservative for 8K context models)
-const DEFAULT_CHUNK_TOKEN_LIMIT = 3000;
+// Approximate token limit per chunk (increased to 30K for modern models like Gemini 1.5 Flash)
+const DEFAULT_CHUNK_TOKEN_LIMIT = 30000;
 
 // Rough character-to-token ratio (English text ≈ 4 chars per token)
 const CHARS_PER_TOKEN = 4;
