@@ -22,90 +22,153 @@ export async function exportAsPdf(result: SummaryResult): Promise<void> {
   const { jsPDF } = await import("jspdf");
   const doc = new jsPDF({ orientation: "portrait", unit: "mm", format: "a4" });
 
-  const margin = 15;
+  const margin = 20;
   const pageWidth = doc.internal.pageSize.getWidth();
+  const PAGE_HEIGHT = doc.internal.pageSize.getHeight();
   const maxWidth = pageWidth - margin * 2;
   let y = margin;
+
+  const checkPageBreak = (neededHeight: number) => {
+    if (y + neededHeight > PAGE_HEIGHT - margin) {
+      doc.addPage();
+      y = margin;
+      return true;
+    }
+    return false;
+  };
 
   const addText = (
     text: string,
     fontSize: number,
     bold = false,
-    color: [number, number, number] = [30, 30, 30]
+    color: [number, number, number] = [30, 30, 30],
+    indent = 0
   ) => {
     doc.setFontSize(fontSize);
     doc.setFont("helvetica", bold ? "bold" : "normal");
     doc.setTextColor(...color);
-    const lines = doc.splitTextToSize(text, maxWidth);
-    if (y + lines.length * fontSize * 0.4 > doc.internal.pageSize.getHeight() - margin) {
-      doc.addPage();
-      y = margin;
-    }
-    doc.text(lines, margin, y);
-    y += lines.length * fontSize * 0.4 + 3;
+    
+    // Simple markdown cleanup
+    const cleanText = text.replace(/\*\*/g, "").replace(/\*/g, "");
+    
+    const lines = doc.splitTextToSize(cleanText, maxWidth - indent);
+    const lineHeight = fontSize * 0.45;
+    
+    checkPageBreak(lines.length * lineHeight);
+    
+    doc.text(lines, margin + indent, y);
+    y += lines.length * lineHeight + 2;
   };
 
-  const addSectionHeader = (title: string) => {
-    y += 4;
-    addText(title, 13, true, [79, 70, 229]); // indigo
-    y += 1;
-  };
-
-  const addDivider = () => {
-    doc.setDrawColor(200, 200, 220);
-    doc.line(margin, y, pageWidth - margin, y);
-    y += 5;
-  };
-
-  // Header
-  addText("QuickClip Summary", 20, true, [79, 70, 229]);
-  addText(result.videoTitle, 14, true);
-  addText(
-    `Summary Length: ${result.summaryLength.charAt(0).toUpperCase() + result.summaryLength.slice(1)}`,
-    10,
-    false,
-    [100, 100, 100]
-  );
-  addText(`Source: ${result.videoUrl}`, 9, false, [120, 120, 180]);
-  addDivider();
-
-  // Summary
-  addSectionHeader("📄 Summary");
-  addText(result.overallSummary, 10);
-
-  // Key Points
-  addSectionHeader("✅ Key Points");
-  result.keyPoints.forEach((point, i) => {
-    addText(`${i + 1}. ${point}`, 10);
-  });
-
-  // Timestamps
-  addSectionHeader("⏱ Timestamps");
-  result.timestamps.forEach((ts) => {
-    addText(`[${ts.time}] ${ts.label}`, 10, true);
-    addText(ts.description, 10);
-    y += 1;
-  });
-
-  // Quiz
-  addSectionHeader("🧠 Quiz");
-  result.quiz.forEach((q, i) => {
-    addText(`Q${i + 1}: ${q.question}`, 10, true);
-    q.options.forEach((opt, j) => {
-      const isCorrect = opt === q.correctAnswer;
-      addText(`  ${["A", "B", "C", "D"][j]}. ${opt}${isCorrect ? "  ✓" : ""}`, 10, isCorrect, isCorrect ? [34, 197, 94] : [60, 60, 60]);
-    });
-    addText(`Explanation: ${q.explanation}`, 9, false, [120, 120, 120]);
+  const addHeaderSection = (title: string) => {
+    y += 6;
+    checkPageBreak(10);
+    doc.setDrawColor(99, 102, 241);
+    doc.setLineWidth(0.5);
+    doc.line(margin, y, margin + 10, y);
     y += 2;
+    addText(title.toUpperCase(), 11, true, [99, 102, 241]);
+    y += 1;
+  };
+
+  // --- Title & Header ---
+  doc.setFillColor(99, 102, 241);
+  doc.rect(0, 0, pageWidth, 40, "F");
+  
+  doc.setTextColor(255, 255, 255);
+  doc.setFontSize(24);
+  doc.setFont("helvetica", "bold");
+  doc.text("QuickClip", margin, 20);
+  
+  doc.setFontSize(10);
+  doc.setFont("helvetica", "normal");
+  doc.text("AI-POWERED VIDEO SUMMARY", margin, 28);
+
+  y = 50;
+
+  // Video Info
+  addText(result.videoTitle, 16, true, [20, 20, 20]);
+  addText(`Source: ${result.videoUrl}`, 9, false, [99, 102, 241]);
+  addText(`Length: ${result.summaryLength.toUpperCase()}`, 9, true, [100, 100, 100]);
+  
+  y += 5;
+  doc.setDrawColor(240, 240, 245);
+  doc.line(margin, y, pageWidth - margin, y);
+  y += 5;
+
+  // --- Render Summary with Markdown handling ---
+  addHeaderSection("SUMMARY");
+  
+  const summaryBlocks = result.overallSummary.split("\n");
+  summaryBlocks.forEach(block => {
+    const trimmed = block.trim();
+    if (!trimmed) {
+      y += 2;
+      return;
+    }
+
+    if (trimmed.startsWith("###")) {
+      y += 3;
+      const h3Text = trimmed.replace(/^###\s*/, "");
+      addText(h3Text, 12, true, [40, 40, 40]);
+      y += 1;
+    } else if (trimmed.startsWith("* ") || trimmed.startsWith("- ")) {
+      const bulletText = trimmed.replace(/^[*|-]\s*/, "");
+      addText(`• ${bulletText}`, 10, false, [50, 50, 50], 5);
+    } else {
+      addText(trimmed, 10, false, [60, 60, 60]);
+    }
   });
 
-  // Footer
-  y = doc.internal.pageSize.getHeight() - 10;
-  doc.setFontSize(8);
-  doc.setTextColor(150, 150, 150);
-  doc.text("Generated by QuickClip • quickclip.app", margin, y);
+  // --- Key Points ---
+  addHeaderSection("KEY INSIGHTS");
+  result.keyPoints.forEach((point, i) => {
+    addText(`${i + 1}. ${point}`, 10, false, [50, 50, 50], 3);
+  });
 
-  doc.save(`quickclip-${sanitizeFilename(result.videoTitle)}.pdf`);
+  // --- Timestamps ---
+  if (result.timestamps.length > 0) {
+    addHeaderSection("TIMESTAMPS");
+    result.timestamps.forEach((ts) => {
+      checkPageBreak(12);
+      doc.setFontSize(9);
+      doc.setFont("helvetica", "bold");
+      doc.setTextColor(99, 102, 241);
+      doc.text(`[${ts.time}] ${ts.label}`, margin, y);
+      y += 4;
+      addText(ts.description, 9, false, [100, 100, 100], 0);
+      y += 1;
+    });
+  }
+
+  // --- Quiz ---
+  if (result.quiz.length > 0) {
+    addHeaderSection("INTERACTIVE QUIZ");
+    result.quiz.forEach((q, i) => {
+      y += 2;
+      addText(`Q${i + 1}: ${q.question}`, 10, true, [30, 30, 30]);
+      q.options.forEach((opt, j) => {
+        const optionLabel = ["A", "B", "C", "D"][j];
+        addText(`   ${optionLabel}. ${opt}`, 9, false, [80, 80, 80], 5);
+      });
+      y += 1;
+      addText(`Correct: ${q.correctAnswer}`, 8, true, [34, 197, 94], 5);
+      addText(`Reason: ${q.explanation}`, 8, false, [120, 120, 120], 5);
+    });
+  }
+
+  // Footer on last page
+  const pageCount = doc.getNumberOfPages();
+  for (let i = 1; i <= pageCount; i++) {
+    doc.setPage(i);
+    doc.setFontSize(8);
+    doc.setTextColor(180, 180, 180);
+    doc.text(`Page ${i} of ${pageCount}`, pageWidth - margin - 20, PAGE_HEIGHT - 10);
+    doc.text("Generated by QuickClip", margin, PAGE_HEIGHT - 10);
+  }
+
+  const filename = sanitizeFilename(result.videoTitle) || "summary";
+  doc.save(`quickclip-${filename}.pdf`);
 }
 
 // ─── Helpers ───────────────────────────────────────────────────────────────────

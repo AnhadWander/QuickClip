@@ -83,10 +83,14 @@ export async function summarizeTranscript(
     combinedTranscriptForFinal = timestampedText;
   }
 
+  const lastSegment = segments[segments.length - 1];
+  const totalDuration = lastSegment ? lastSegment.start + lastSegment.duration : 0;
+
   const result = await generateFinalSummary(
     combinedTranscriptForFinal,
     summaryLength,
-    videoTitle
+    videoTitle,
+    totalDuration
   );
 
   return {
@@ -115,9 +119,10 @@ async function summarizeChunk(
 async function generateFinalSummary(
   transcriptText: string,
   summaryLength: SummaryLength,
-  videoTitle: string
+  videoTitle: string,
+  duration: number
 ): Promise<SummaryResult> {
-  const prompt = buildFinalPrompt(transcriptText, summaryLength, videoTitle);
+  const prompt = buildFinalPrompt(transcriptText, summaryLength, videoTitle, duration);
   const raw = await callLLM(prompt);
 
   try {
@@ -236,23 +241,38 @@ Write your segment summary now (include [MM:SS] markers where significant topics
 function buildFinalPrompt(
   transcriptText: string,
   summaryLength: SummaryLength,
-  videoTitle: string
+  videoTitle: string,
+  duration: number
 ): string {
-  const lengthInstruction =
-    summaryLength === "brief"
-      ? "3–5 short, concise sentences."
-      : summaryLength === "standard"
-        ? "2–3 distinct sections (total 8–12 sentences). Use Markdown headers (###) and bolding to make it skimmable."
-        : "5–7 distinct, in-depth sections (total 25–40 sentences). This must be a comprehensive breakdown of every major point in the 10+ minute video. Use Markdown headers (###), bolding, and bullet points within the summary string to ensure maximum readability and depth.";
+  const durationMin = Math.max(1, Math.round(duration / 60));
+  
+  let lengthInstruction = "";
+  let keyPointCount = 0;
+  let quizCount = 0;
+  let timestampCount = 0;
 
-  const keyPointCount =
-    summaryLength === "brief" ? 3 : summaryLength === "standard" ? 5 : 12;
-
-  const quizCount =
-    summaryLength === "brief" ? 3 : summaryLength === "standard" ? 5 : 10;
-
-  const timestampCount =
-    summaryLength === "brief" ? 4 : summaryLength === "standard" ? 6 : 12;
+  if (summaryLength === "brief") {
+    // Scaling brief: roughly 1 sentence per 2 mins, cap at 6
+    const sentences = Math.min(6, Math.max(3, Math.ceil(durationMin / 2)));
+    lengthInstruction = `${sentences} short, concise sentences.`;
+    keyPointCount = Math.min(5, Math.max(3, Math.ceil(durationMin / 3)));
+    quizCount = 3;
+    timestampCount = Math.min(5, Math.max(3, Math.ceil(durationMin / 4)));
+  } else if (summaryLength === "standard") {
+    // Scaling standard: roughly 1 section per 4 mins
+    const sections = Math.min(5, Math.max(2, Math.ceil(durationMin / 4)));
+    lengthInstruction = `${sections} distinct sections (total ${sections * 4}–${sections * 6} sentences). Use Markdown headers (###) and bolding to make it skimmable.`;
+    keyPointCount = Math.min(10, Math.max(5, Math.ceil(durationMin / 2)));
+    quizCount = 5;
+    timestampCount = Math.min(8, Math.max(4, Math.ceil(durationMin / 2)));
+  } else {
+    // Scaling detailed: roughly 1 section per 2-3 mins
+    const sections = Math.min(10, Math.max(4, Math.ceil(durationMin / 2.5)));
+    lengthInstruction = `${sections} distinct, in-depth sections (total ${sections * 6}–${sections * 10} sentences). This must be a comprehensive breakdown of every major point in this ${durationMin}-minute video. Use Markdown headers (###), bolding, and bullet lists for maximum depth.`;
+    keyPointCount = Math.min(15, Math.max(8, durationMin));
+    quizCount = Math.min(12, Math.max(7, Math.ceil(durationMin / 1.5)));
+    timestampCount = Math.min(15, Math.max(6, durationMin));
+  }
 
   return `You are an expert video summarizer for students and researchers. Analyze the following transcript (which may be a collection of segment summaries) and generate structured study notes.
 
