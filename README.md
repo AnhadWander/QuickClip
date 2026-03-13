@@ -2,7 +2,14 @@
 
 QuickClip is a production-ready Next.js web application that instantly turns any YouTube video into structured study notes, key insights, timestamps, and an interactive quiz. Designed for students, researchers, and lifelong learners.
 
-Built with Next.js 14, TypeScript, Tailwind CSS, Firebase (Auth + Firestore), and Google Gemini / OpenAI.
+Built with a modern stack and refined for premium performance:
+- **Core**: [Next.js 14](https://nextjs.org/) (App Router), [TypeScript](https://www.typescriptlang.org/), [Tailwind CSS](https://tailwindcss.com/)
+- **AI Engine**: [Google Gemini Pro](https://ai.google.dev/) & [OpenAI GPT-4o](https://openai.com/) (Provider Swappable)
+- **Database & Auth**: [Firebase](https://firebase.google.com/) (Auth + Cloud Firestore)
+- **Rich Summaries**: [react-markdown](https://github.com/remarkjs/react-markdown) for beautiful AI formatting
+- **Exports**: [jsPDF](https://github.com/parallax/jsPDF) for professional PDF generation
+- **Icons**: [Lucide-React](https://lucide.dev/) for sleek modern iconography
+- **Transcripts**: Custom Python bridge using `youtube-transcript-api`
 
 ---
 
@@ -32,9 +39,18 @@ Built with Next.js 14, TypeScript, Tailwind CSS, Firebase (Auth + Firestore), an
 
 ### 1. Install Dependencies
 
+**Node.js Dependencies:**
 ```bash
 cd QuickClip
 npm install
+```
+
+**Python Dependencies:**
+QuickClip uses Python for transcript extraction. Ensure you have Python 3.9+ installed, then set up the virtual environment:
+```bash
+python3 -m venv venv
+source venv/bin/activate  # On Windows: venv\Scripts\activate
+pip install -r requirements.txt
 ```
 
 ### 2. Environment Variables
