@@ -64,16 +64,34 @@ pip install -r requirements.txt
 ```
 
 ### 4. Configuration
-QuickClip requires several environment variables for AI generation and history saving.
+QuickClip uses environment variables for AI generation and Firestore history. We use the **Firebase Client SDK**, meaning collaborators typically **do not** need a service account key for local development.
 
 1.  **Create your local environment file**:
     ```bash
     cp .env.local.example .env.local
     ```
 2.  **Add your Gemini API Key**:
-    Open the new `.env.local` file and paste your Google AI key into the `GEMINI_API_KEY` field. You can obtain a key from the [Google AI Studio](https://aistudio.google.com/).
-3.  **Configure Remaining Variables**:
-    Fill in your Firebase public credentials (API Key, Project ID, etc.) found in your Firebase Console.
+    Obtain a key from the [Google AI Studio](https://aistudio.google.com/) and paste it into the `GEMINI_API_KEY` field. 
+    > [!TIP]
+    > Teammates should share this key privately. Do not commit it to Git.
+
+3.  **Configure Firebase Settings**:
+    Since we share the same Firebase project, most of these values are consistent for the whole team. Fill in the following in your `.env.local`:
+    ```bash
+    NEXT_PUBLIC_FIREBASE_API_KEY=...
+    NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN=...
+    NEXT_PUBLIC_FIREBASE_PROJECT_ID=...
+    NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET=...
+    NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID=...
+    NEXT_PUBLIC_FIREBASE_APP_ID=...
+    GEMINI_API_KEY=...
+    GEMINI_MODEL=gemini-3.1-flash-lite-preview
+    ```
+
+**Note for Collaborators**:
+*   **No Service Account Key Needed**: We migrated to the Client SDK. You only need the public web config values listed above.
+*   **Access Control**: Security is handled via **Firestore Security Rules**. You will only be able to see and delete your own history items.
+*   **Firebase Project**: Ensure you have been added as a collaborator to the Firebase project in the Firebase Console to manage rules or view the database.
 
 ### 5. Firestore Rules
 Paste the following rules into the **Rules** tab of your Firestore Database to secure user history:
