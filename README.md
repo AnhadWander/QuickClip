@@ -45,16 +45,6 @@ Copy `.env.local.example` to `.env.local`:
 cp .env.local.example .env.local
 ```
 
-You have two choices to start:
-
-**Option A: Mock Mode (Easiest)**
-Set `NEXT_PUBLIC_USE_MOCK="true"` in your `.env.local`. The app will run using rich mock data without requiring any API keys or Firebase project setup!
-
-**Option B: Full Setup**
-1. Set `NEXT_PUBLIC_USE_MOCK="false"`
-2. Add your `GEMINI_API_KEY` or `OPENAI_API_KEY`
-3. Set `LLM_PROVIDER="gemini"` or `"openai"`
-
 ### 3. Firestore Security Rules
 
 Deploy or paste these rules into the Firestore "Rules" tab in the Firebase console:
