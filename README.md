@@ -91,4 +91,4 @@ To switch models:
 4. **Export formatting**: Use standard markdown exporting.
 
 ---
-*Created as a class project deliverable. Fully typed, zero-hack implementation.*
+
