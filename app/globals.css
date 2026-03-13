@@ -312,7 +312,7 @@ h1, h2, h3, h4, h5 {
 .markdown-content h1, .markdown-content h2, .markdown-content h3 {
   margin-top: 1.5rem;
   margin-bottom: 0.75rem;
-  color: var(--color-text);
+  color: var(--color-primary);
 }
 
 .markdown-content h3 {
@@ -321,6 +321,7 @@ h1, h2, h3, h4, h5 {
   padding-bottom: 0.3rem;
   display: inline-block;
   margin-bottom: 1rem;
+  color: var(--color-accent);
 }
 
 .markdown-content p {
