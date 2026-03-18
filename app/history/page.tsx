@@ -114,10 +114,65 @@ export default function HistoryPage() {
             </p>
           </div>
         </div>
-        <Link href="/" className="btn-primary" style={{ textDecoration: "none", display: "flex", alignItems: "center", gap: "0.5rem" }}>
-          <Plus size={18} />
-          New Summary
-        </Link>
+        <div style={{ display: "flex", alignItems: "center", gap: "0.75rem", flexWrap: "wrap" }}>
+          {/* Search Input */}
+          <div style={{ position: "relative", minWidth: "280px", maxWidth: "350px" }}>
+            <div style={{ position: "absolute", left: "1rem", top: "50%", transform: "translateY(-50%)", pointerEvents: "none" }}>
+              <Search size={18} color="var(--color-text-muted)" />
+            </div>
+            <input
+              type="text"
+              placeholder="Search summaries..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="input-field"
+              style={{
+                paddingLeft: "2.75rem",
+                paddingRight: searchQuery ? "2.75rem" : "1.25rem",
+                fontSize: "0.9rem",
+                height: "44px"
+              }}
+              aria-label="Search history"
+            />
+            {searchQuery && (
+              <button
+                onClick={() => setSearchQuery("")}
+                style={{
+                  position: "absolute",
+                  right: "0.75rem",
+                  top: "50%",
+                  transform: "translateY(-50%)",
+                  background: "rgba(255,255,255,0.1)",
+                  border: "none",
+                  borderRadius: "50%",
+                  width: "24px",
+                  height: "24px",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  cursor: "pointer",
+                  transition: "all 0.2s ease",
+                  color: "var(--color-text-muted)"
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.background = "rgba(255,255,255,0.15)";
+                  e.currentTarget.style.color = "var(--color-text)";
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.background = "rgba(255,255,255,0.1)";
+                  e.currentTarget.style.color = "var(--color-text-muted)";
+                }}
+                aria-label="Clear search"
+              >
+                <X size={14} />
+              </button>
+            )}
+          </div>
+          <Link href="/" className="btn-primary" style={{ textDecoration: "none", display: "flex", alignItems: "center", gap: "0.5rem", whiteSpace: "nowrap" }}>
+            <Plus size={18} />
+            New Summary
+          </Link>
+        </div>
       </div>
 
       {history.length === 0 ? (
