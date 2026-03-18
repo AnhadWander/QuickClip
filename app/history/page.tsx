@@ -11,7 +11,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { useAuth } from "@/context/AuthContext";
 import type { HistoryItem } from "@/lib/types";
-import { History, Trash2, ArrowRight, Loader2, PlayCircle, Plus } from "lucide-react";
+import { History, Trash2, ArrowRight, Loader2, PlayCircle, Plus, Search, X, BookOpen } from "lucide-react";
 import toast from "react-hot-toast";
 import { getHistory, deleteHistory } from "@/lib/firestore";
 
@@ -22,6 +22,7 @@ export default function HistoryPage() {
   const [history, setHistory] = useState<HistoryItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [deletingId, setDeletingId] = useState<string | null>(null);
+  const [searchQuery, setSearchQuery] = useState("");
 
   useEffect(() => {
     if (authLoading) return;
@@ -72,6 +73,22 @@ export default function HistoryPage() {
     router.push("/results");
   };
 
+  // Filter history based on search query
+  const filteredHistory = searchQuery.trim() === ""
+    ? history
+    : history.filter(item => {
+        const query = searchQuery.toLowerCase();
+        return (
+          item.videoTitle.toLowerCase().includes(query) ||
+          item.overallSummary.toLowerCase().includes(query) ||
+          item.keyPoints.some(point => point.toLowerCase().includes(query)) ||
+          item.timestamps.some(ts =>
+            ts.label.toLowerCase().includes(query) ||
+            ts.description.toLowerCase().includes(query)
+          )
+        );
+      });
+
   if (authLoading || loading) {
     return (
       <div className="container-app" style={{ padding: "4rem 1.25rem", display: "flex", justifyContent: "center" }}>
@@ -89,29 +106,102 @@ export default function HistoryPage() {
           </div>
           <div>
             <h1 style={{ fontSize: "1.5rem", fontWeight: 800, color: "var(--color-text)" }}>Your History</h1>
-            <p style={{ color: "var(--color-text-muted)", fontSize: "0.9rem" }}>Access your previously generated notes</p>
+            <p style={{ color: "var(--color-text-muted)", fontSize: "0.9rem" }}>
+              {searchQuery
+                ? `${filteredHistory.length} result${filteredHistory.length !== 1 ? 's' : ''} found`
+                : "Access your previously generated notes"
+              }
+            </p>
           </div>
         </div>
-        <Link href="/" className="btn-primary" style={{ textDecoration: "none", display: "flex", alignItems: "center", gap: "0.5rem" }}>
-          <Plus size={18} />
-          New Summary
-        </Link>
+        <div style={{ display: "flex", alignItems: "center", gap: "0.75rem", flexWrap: "wrap" }}>
+          {/* Search Input */}
+          <div style={{ position: "relative", minWidth: "280px", maxWidth: "350px" }}>
+            <div style={{ position: "absolute", left: "1rem", top: "50%", transform: "translateY(-50%)", pointerEvents: "none" }}>
+              <Search size={18} color="var(--color-text-muted)" />
+            </div>
+            <input
+              type="text"
+              placeholder="Search summaries..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="input-field"
+              style={{
+                paddingLeft: "2.75rem",
+                paddingRight: searchQuery ? "2.75rem" : "1.25rem",
+                fontSize: "0.9rem",
+                height: "44px"
+              }}
+              aria-label="Search history"
+            />
+            {searchQuery && (
+              <button
+                onClick={() => setSearchQuery("")}
+                style={{
+                  position: "absolute",
+                  right: "0.75rem",
+                  top: "50%",
+                  transform: "translateY(-50%)",
+                  background: "rgba(255,255,255,0.1)",
+                  border: "none",
+                  borderRadius: "50%",
+                  width: "24px",
+                  height: "24px",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  cursor: "pointer",
+                  transition: "all 0.2s ease",
+                  color: "var(--color-text-muted)"
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.background = "rgba(255,255,255,0.15)";
+                  e.currentTarget.style.color = "var(--color-text)";
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.background = "rgba(255,255,255,0.1)";
+                  e.currentTarget.style.color = "var(--color-text-muted)";
+                }}
+                aria-label="Clear search"
+              >
+                <X size={14} />
+              </button>
+            )}
+          </div>
+          <Link href="/" className="btn-primary" style={{ textDecoration: "none", display: "flex", alignItems: "center", gap: "0.5rem", whiteSpace: "nowrap" }}>
+            <Plus size={18} />
+            New Summary
+          </Link>
+        </div>
       </div>
 
-      {history.length === 0 ? (
+      {filteredHistory.length === 0 ? (
         <div className="section-card fade-in-up" style={{ textAlign: "center", padding: "4rem 2rem" }}>
           <div style={{ width: 64, height: 64, borderRadius: "50%", background: "var(--color-surface-2)", display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 1.5rem" }}>
-            <BookOpen size={28} color="var(--color-text-muted)" />
+            {searchQuery ? (
+              <Search size={28} color="var(--color-text-muted)" />
+            ) : (
+              <BookOpen size={28} color="var(--color-text-muted)" />
+            )}
           </div>
-          <h2 style={{ fontSize: "1.2rem", fontWeight: 700, marginBottom: "0.5rem" }}>No summaries yet</h2>
-          <p style={{ color: "var(--color-text-muted)", marginBottom: "2rem" }}>You haven't saved any YouTube summaries yet.</p>
-          <Link href="/" className="btn-primary" style={{ textDecoration: "none" }}>
-            Create Your First Summary
-          </Link>
+          <h2 style={{ fontSize: "1.2rem", fontWeight: 700, marginBottom: "0.5rem" }}>
+            {searchQuery ? "No results found" : "No summaries yet"}
+          </h2>
+          <p style={{ color: "var(--color-text-muted)", marginBottom: "2rem" }}>
+            {searchQuery
+              ? `No summaries match "${searchQuery}". Try a different search term.`
+              : "You haven't saved any YouTube summaries yet."
+            }
+          </p>
+          {!searchQuery && (
+            <Link href="/" className="btn-primary" style={{ textDecoration: "none" }}>
+              Create Your First Summary
+            </Link>
+          )}
         </div>
       ) : (
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(320px, 1fr))", gap: "1.25rem" }}>
-          {history.map((item, i) => (
+          {filteredHistory.map((item, i) => (
             <div
               key={item.id}
               onClick={() => handleOpenResult(item)}
@@ -188,6 +278,3 @@ export default function HistoryPage() {
     </div>
   );
 }
-
-// Add BookOpen icon for empty state
-import { BookOpen } from "lucide-react";
