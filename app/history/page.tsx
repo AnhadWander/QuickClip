@@ -11,7 +11,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { useAuth } from "@/context/AuthContext";
 import type { HistoryItem } from "@/lib/types";
-import { History, Trash2, ArrowRight, Loader2, PlayCircle, Plus } from "lucide-react";
+import { History, Trash2, ArrowRight, Loader2, PlayCircle, Plus, Search, X } from "lucide-react";
 import toast from "react-hot-toast";
 import { getHistory, deleteHistory } from "@/lib/firestore";
 
@@ -22,6 +22,7 @@ export default function HistoryPage() {
   const [history, setHistory] = useState<HistoryItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [deletingId, setDeletingId] = useState<string | null>(null);
+  const [searchQuery, setSearchQuery] = useState("");
 
   useEffect(() => {
     if (authLoading) return;
@@ -71,6 +72,22 @@ export default function HistoryPage() {
     sessionStorage.setItem("quickclip_result", JSON.stringify(resultData));
     router.push("/results");
   };
+
+  // Filter history based on search query
+  const filteredHistory = searchQuery.trim() === ""
+    ? history
+    : history.filter(item => {
+        const query = searchQuery.toLowerCase();
+        return (
+          item.videoTitle.toLowerCase().includes(query) ||
+          item.overallSummary.toLowerCase().includes(query) ||
+          item.keyPoints.some(point => point.toLowerCase().includes(query)) ||
+          item.timestamps.some(ts =>
+            ts.label.toLowerCase().includes(query) ||
+            ts.description.toLowerCase().includes(query)
+          )
+        );
+      });
 
   if (authLoading || loading) {
     return (
