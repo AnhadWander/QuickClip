@@ -11,7 +11,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { useAuth } from "@/context/AuthContext";
 import type { HistoryItem } from "@/lib/types";
-import { History, Trash2, ArrowRight, Loader2, PlayCircle, Plus, Search, X } from "lucide-react";
+import { History, Trash2, ArrowRight, Loader2, PlayCircle, Plus, Search, X, BookOpen } from "lucide-react";
 import toast from "react-hot-toast";
 import { getHistory, deleteHistory } from "@/lib/firestore";
 
@@ -205,6 +205,3 @@ export default function HistoryPage() {
     </div>
   );
 }
-
-// Add BookOpen icon for empty state
-import { BookOpen } from "lucide-react";
