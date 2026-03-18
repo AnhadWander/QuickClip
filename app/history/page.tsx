@@ -69,7 +69,10 @@ export default function HistoryPage() {
   const handleOpenResult = (item: HistoryItem) => {
     // Strip out 'id', 'userId', 'createdAt' to match SummaryResult shape
     const { id, userId, createdAt, ...resultData } = item;
-    sessionStorage.setItem("quickclip_result", JSON.stringify(resultData));
+    sessionStorage.setItem("quickclip_result", JSON.stringify({
+      data: resultData,
+      isFromHistory: true
+    }));
     router.push("/results");
   };
 
