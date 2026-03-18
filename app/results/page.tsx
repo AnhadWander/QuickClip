@@ -29,13 +29,23 @@ export default function ResultsPage() {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
+  const [isFromHistory, setIsFromHistory] = useState(false);
 
   useEffect(() => {
     // Load result from sessionStorage on mount
     const data = sessionStorage.getItem("quickclip_result");
     if (data) {
       try {
-        setResult(JSON.parse(data));
+        const parsed = JSON.parse(data);
+        // Handle both old format (direct result) and new format (with isFromHistory flag)
+        if (parsed.data && typeof parsed.isFromHistory === 'boolean') {
+          setResult(parsed.data);
+          setIsFromHistory(parsed.isFromHistory);
+        } else {
+          // Backward compatibility: treat old format as new summary
+          setResult(parsed);
+          setIsFromHistory(false);
+        }
       } catch (err) {
         console.error("Failed to parse result data", err);
       }
@@ -46,9 +56,9 @@ export default function ResultsPage() {
     setLoading(false);
   }, [router]);
 
-  // Auto-save to history when result and user are available
+  // Auto-save to history when result and user are available (only for new summaries)
   useEffect(() => {
-    if (!result || !user || saved || saving || authLoading) return;
+    if (!result || !user || saved || saving || authLoading || isFromHistory) return;
 
     const autoSave = async () => {
       setSaving(true);
@@ -64,7 +74,7 @@ export default function ResultsPage() {
     };
 
     autoSave();
-  }, [result, user, saved, saving, authLoading]);
+  }, [result, user, saved, saving, authLoading, isFromHistory]);
 
   if (loading) {
     return (
