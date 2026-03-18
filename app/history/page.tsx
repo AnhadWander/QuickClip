@@ -175,20 +175,33 @@ export default function HistoryPage() {
         </div>
       </div>
 
-      {history.length === 0 ? (
+      {filteredHistory.length === 0 ? (
         <div className="section-card fade-in-up" style={{ textAlign: "center", padding: "4rem 2rem" }}>
           <div style={{ width: 64, height: 64, borderRadius: "50%", background: "var(--color-surface-2)", display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 1.5rem" }}>
-            <BookOpen size={28} color="var(--color-text-muted)" />
+            {searchQuery ? (
+              <Search size={28} color="var(--color-text-muted)" />
+            ) : (
+              <BookOpen size={28} color="var(--color-text-muted)" />
+            )}
           </div>
-          <h2 style={{ fontSize: "1.2rem", fontWeight: 700, marginBottom: "0.5rem" }}>No summaries yet</h2>
-          <p style={{ color: "var(--color-text-muted)", marginBottom: "2rem" }}>You haven't saved any YouTube summaries yet.</p>
-          <Link href="/" className="btn-primary" style={{ textDecoration: "none" }}>
-            Create Your First Summary
-          </Link>
+          <h2 style={{ fontSize: "1.2rem", fontWeight: 700, marginBottom: "0.5rem" }}>
+            {searchQuery ? "No results found" : "No summaries yet"}
+          </h2>
+          <p style={{ color: "var(--color-text-muted)", marginBottom: "2rem" }}>
+            {searchQuery
+              ? `No summaries match "${searchQuery}". Try a different search term.`
+              : "You haven't saved any YouTube summaries yet."
+            }
+          </p>
+          {!searchQuery && (
+            <Link href="/" className="btn-primary" style={{ textDecoration: "none" }}>
+              Create Your First Summary
+            </Link>
+          )}
         </div>
       ) : (
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(320px, 1fr))", gap: "1.25rem" }}>
-          {history.map((item, i) => (
+          {filteredHistory.map((item, i) => (
             <div
               key={item.id}
               onClick={() => handleOpenResult(item)}
