@@ -106,7 +106,12 @@ export default function HistoryPage() {
           </div>
           <div>
             <h1 style={{ fontSize: "1.5rem", fontWeight: 800, color: "var(--color-text)" }}>Your History</h1>
-            <p style={{ color: "var(--color-text-muted)", fontSize: "0.9rem" }}>Access your previously generated notes</p>
+            <p style={{ color: "var(--color-text-muted)", fontSize: "0.9rem" }}>
+              {searchQuery
+                ? `${filteredHistory.length} result${filteredHistory.length !== 1 ? 's' : ''} found`
+                : "Access your previously generated notes"
+              }
+            </p>
           </div>
         </div>
         <Link href="/" className="btn-primary" style={{ textDecoration: "none", display: "flex", alignItems: "center", gap: "0.5rem" }}>
