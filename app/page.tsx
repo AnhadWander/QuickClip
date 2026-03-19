@@ -42,8 +42,11 @@ export default function HomePage() {
         return;
       }
 
-      // Store result in sessionStorage and navigate
-      sessionStorage.setItem("quickclip_result", JSON.stringify(data.data));
+      // Store result in sessionStorage with flag indicating it's a new summary
+      sessionStorage.setItem("quickclip_result", JSON.stringify({
+        data: data.data,
+        isFromHistory: false
+      }));
       router.push("/results");
     } catch {
       setError("Network error. Please check your connection and try again.");
