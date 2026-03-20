@@ -42,6 +42,8 @@ export default function QuizSection({ quiz }: Props) {
   ).length;
 
   const allAnswered = revealed.every(Boolean);
+  const answeredCount = revealed.filter(Boolean).length;
+  const progressPercent = (answeredCount / quiz.length) * 100;
    const handleRetake = () => {
     setAnswers(new Array(quiz.length).fill(null));
     setRevealed(new Array(quiz.length).fill(false));
