@@ -134,6 +134,24 @@ export default function QuizSection({ quiz }: Props) {
         
       </div>
 
+           {/* Progress Bar */}
+      <div style={{
+        width: "100%",
+        height: 6,
+        borderRadius: 999,
+        background: "var(--color-border)",
+        marginBottom: "1.5rem",
+        overflow: "hidden",
+      }}>
+        <div style={{
+          height: "100%",
+          width: `${progressPercent}%`,
+          borderRadius: 999,
+          background: "linear-gradient(90deg, #6366f1, #a78bfa)",
+          transition: "width 0.4s ease",
+        }} />
+      </div>
+
       {/* Questions */}
       <div style={{ display: "flex", flexDirection: "column", gap: "2rem" }}>
         {quiz.map((q, qIdx) => (
