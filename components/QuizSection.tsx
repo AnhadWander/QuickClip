@@ -43,6 +43,14 @@ export default function QuizSection({ quiz }: Props) {
 
   const allAnswered = revealed.every(Boolean);
    const handleRetake = () => {
+    const getMotivationalMessage = () => {
+    const percentage = (score / quiz.length) * 100;
+    if (percentage === 100) return "Perfect score!";
+    if (percentage >= 80) return "Great job! You really know this!";
+    if (percentage >= 60) return "Nice work! Keep it up!";
+    if (percentage >= 40) return "Good effort! Review and try again!";
+    return "Keep studying, you've got this!";
+  };
     setAnswers(new Array(quiz.length).fill(null));
     setRevealed(new Array(quiz.length).fill(false));
   };
