@@ -21,6 +21,10 @@ export default function SummaryCard({ result }: Props) {
     detailed: "#a78bfa",
   };
 
+  const wordCount = result.overallSummary.trim().split(/\s+/).length;
+  const readingTimeMinutes = Math.ceil(wordCount / 200);
+  const readingTimeText = readingTimeMinutes < 1 ? "< 1 min read" : `~${readingTimeMinutes} min read`;
+
   return (
     <div className="flex flex-col gap-5">
       <div className="section-card fade-in-up flex gap-5 items-start flex-wrap">
