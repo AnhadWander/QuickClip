@@ -91,6 +91,25 @@ export default function QuizSection({ quiz }: Props) {
             </span>
           </div>
         )}
+        
+        {allAnswered && (
+          <button
+            onClick={handleRetake}
+            style={{
+              padding: "0.4rem 0.9rem",
+              borderRadius: 999,
+              background: "rgba(99,102,241,0.15)",
+              border: "1px solid rgba(99,102,241,0.3)",
+              color: "var(--color-accent)",
+              fontWeight: 700,
+              fontSize: "0.88rem",
+              cursor: "pointer",
+            }}
+          >
+            Retake Quiz
+          </button>
+        )}
+        
       </div>
 
       {/* Questions */}
