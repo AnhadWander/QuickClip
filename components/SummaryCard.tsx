@@ -7,8 +7,9 @@
 
 import Image from "next/image";
 import type { SummaryResult } from "@/lib/types";
-import { ExternalLink, BookOpen } from "lucide-react";
 import ReactMarkdown from "react-markdown";
+import { ExternalLink, BookOpen, Clock } from "lucide-react";
+
 
 interface Props {
   result: SummaryResult;
@@ -56,10 +57,11 @@ export default function SummaryCard({ result }: Props) {
               {result.summaryLength}
             </span>
             
-            <span style={{ fontSize: "0.82rem", color: "var(--color-text-muted)" }}>
+           <span style={{ display: "flex", alignItems: "center", gap: "0.3rem", fontSize: "0.82rem", color: "var(--color-text-muted)" }}>
+            <Clock size={13} />
             {readingTimeText}
-            </span>
-            
+              </span>
+
             <a
               href={result.videoUrl}
               target="_blank"
