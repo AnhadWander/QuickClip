@@ -83,7 +83,7 @@ export default function QuizSection({ quiz }: Props) {
             Quiz
           </h3>
         </div>
-        {allAnswered && (
+        {allAnswered && score > 0 && (
           <div style={{ display: "flex", alignItems: "center", gap: "0.5rem", padding: "0.4rem 0.9rem", borderRadius: 999, background: "rgba(250,204,21,0.1)", border: "1px solid rgba(250,204,21,0.25)", color: "#fbbf24" }}>
             <Trophy size={15} />
             <span style={{ fontWeight: 700, fontSize: "0.88rem" }}>
@@ -92,7 +92,7 @@ export default function QuizSection({ quiz }: Props) {
           </div>
         )}
         
-        {allAnswered && (
+        {allAnswered &&  (
           <button
             onClick={handleRetake}
             style={{
