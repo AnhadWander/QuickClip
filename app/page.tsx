@@ -1,8 +1,8 @@
 "use client";
 
-/**
+/*
  * app/page.tsx
- * Landing page – URL input, summary length selector, and feature overview.
+ * Landing page
  */
 
 import { useState, FormEvent } from "react";
@@ -63,7 +63,7 @@ export default function HomePage() {
 
   return (
     <div className="hero-bg" style={{ minHeight: "100vh" }}>
-      {/* ── Hero ── */}
+      {/* hero section */}
       <section style={{ paddingTop: "7rem", paddingBottom: "5rem", textAlign: "center" }}>
         <div className="container-app">
           <div className="fade-in-up" style={{ display: "inline-flex", alignItems: "center", gap: "0.5rem", marginBottom: "1.5rem" }}>
@@ -80,7 +80,7 @@ export default function HomePage() {
             Turn any YouTube video into structured study notes, key insights, timestamps, and a quiz — instantly.
           </p>
 
-          {/* ── Input Form ── */}
+          {/* input form */}
           <form
             onSubmit={handleSubmit}
             className="glass-card fade-in-up fade-in-up-delay-2"
@@ -174,7 +174,7 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* ── How it Works ── */}
+      {/* how it works section */}
       <section style={{ padding: "5rem 0", borderTop: "1px solid var(--color-border)" }}>
         <div className="container-app">
           <div style={{ textAlign: "center", marginBottom: "3rem" }}>
@@ -204,7 +204,7 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* ── Features ── */}
+      {/* features grid */}
       <section style={{ padding: "5rem 0", borderTop: "1px solid var(--color-border)" }}>
         <div className="container-app">
           <h2 style={{ textAlign: "center", fontSize: "1.8rem", fontWeight: 800, color: "var(--color-text)", marginBottom: "3rem" }}>

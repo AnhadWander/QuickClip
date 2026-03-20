@@ -1,10 +1,7 @@
 /**
  * app/api/summarize/route.ts
  * POST /api/summarize
- *
- * Accepts { url, summaryLength }, validates the YouTube URL,
- * retrieves the transcript, and calls the LLM for a structured summary.
- * All LLM and transcript API calls happen server-side only.
+ * Summarizes a video from a url.
  */
 
 import { NextRequest, NextResponse } from "next/server";
@@ -20,7 +17,7 @@ export async function POST(req: NextRequest) {
     const body: SummarizeRequest = await req.json();
     const { url, summaryLength } = body;
 
-    // ── 1. Validate input ────────────────────────────────────────────────────
+    // validate input
 
     if (!url || typeof url !== "string") {
       return NextResponse.json(
@@ -36,7 +33,7 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // ── 2. Validate YouTube URL ──────────────────────────────────────────────
+    // validate url
 
     let videoId: string;
     try {
@@ -48,11 +45,11 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // ── 3. Fetch video metadata (title, thumbnail) ───z────────────────────────
+    // get video metadata
 
     const metadata = await getVideoMetadata(videoId);
 
-    // ── 4. Retrieve or Use Provided Transcript ───────────────────────────────
+    // get transcript or use fallback
 
     let segments = [];
     if (body.rawTranscript && body.rawTranscript.trim().length > 0) {
@@ -76,7 +73,7 @@ export async function POST(req: NextRequest) {
       }
     }
 
-    // ── 5. Generate summary via LLM ──────────────────────────────────────────
+    // call LLM for summary
     console.log(`[API] Dispatching to LLM (${summaryLength} summary) for video: ${metadata.title}...`);
 
     if (segments.length === 0) {
@@ -104,7 +101,7 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // ── 6. Return result ─────────────────────────────────────────────────────
+    // return success
 
     return NextResponse.json({ success: true, data: result });
   } catch (err) {

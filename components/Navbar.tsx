@@ -1,8 +1,8 @@
 "use client";
 
-/**
- * components/Navbar.tsx
- * Top navigation bar with auth state display.
+/*
+ * Navbar.tsx
+ * Main navigation and layout header
  */
 
 import { useState } from "react";
@@ -24,7 +24,7 @@ export default function Navbar() {
     }
   };
 
-  const initials = user?.displayName
+  const userInitials = user?.displayName
     ? user.displayName
         .split(" ")
         .map((n) => n[0])
@@ -49,7 +49,6 @@ export default function Navbar() {
       }}
     >
       <div className="container-app" style={{ display: "flex", alignItems: "center", justifyContent: "space-between", height: "64px" }}>
-        {/* Logo */}
         <Link href="/" aria-label="QuickClip Home Page" style={{ display: "flex", alignItems: "center", gap: "0.5rem", textDecoration: "none" }}>
           <div style={{
             width: 34, height: 34, borderRadius: 10,
@@ -64,7 +63,6 @@ export default function Navbar() {
           </span>
         </Link>
 
-        {/* Desktop Nav */}
         <div style={{ display: "flex", alignItems: "center", gap: "0.5rem" }} className="desktop-nav">
           {!loading && (
             <>
@@ -82,7 +80,7 @@ export default function Navbar() {
                       fontSize: "0.78rem", fontWeight: 700, color: "white",
                       cursor: "default"
                     }} title={user.displayName || user.email || ""}>
-                      {initials}
+                      {userInitials}
                     </div>
                     <button onClick={handleSignOut} className="btn-ghost" style={{ display: "flex", alignItems: "center", gap: "0.4rem", fontSize: "0.9rem" }}>
                       <LogOut size={16} />
@@ -99,7 +97,6 @@ export default function Navbar() {
             </>
           )}
 
-          {/* Mobile hamburger */}
           <button
             onClick={() => setMenuOpen(!menuOpen)}
             className="btn-ghost mobile-menu-btn"
@@ -111,7 +108,6 @@ export default function Navbar() {
         </div>
       </div>
 
-      {/* Mobile Menu */}
       {menuOpen && (
         <div style={{
           borderTop: "1px solid var(--color-border)",
