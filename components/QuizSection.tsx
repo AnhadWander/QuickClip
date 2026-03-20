@@ -99,8 +99,8 @@ export default function QuizSection({ quiz }: Props) {
             </span>
           </div>
         )}
-        
-        {allAnswered && (
+
+         {allAnswered && (
           <p style={{
             width: "100%",
             textAlign: "center",
