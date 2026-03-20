@@ -42,6 +42,10 @@ export default function QuizSection({ quiz }: Props) {
   ).length;
 
   const allAnswered = revealed.every(Boolean);
+   const handleRetake = () => {
+    setAnswers(new Array(quiz.length).fill(null));
+    setRevealed(new Array(quiz.length).fill(false));
+  };
 
   const getOptionState = (qIdx: number, option: string): AnswerState => {
     if (!revealed[qIdx]) return "unanswered";
