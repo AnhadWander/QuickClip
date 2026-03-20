@@ -43,16 +43,16 @@ export default function QuizSection({ quiz }: Props) {
 
   const allAnswered = revealed.every(Boolean);
    const handleRetake = () => {
-    const getMotivationalMessage = () => {
+    setAnswers(new Array(quiz.length).fill(null));
+    setRevealed(new Array(quiz.length).fill(false));
+  };
+   const getMotivationalMessage = () => {
     const percentage = (score / quiz.length) * 100;
     if (percentage === 100) return "Perfect score!";
     if (percentage >= 80) return "Great job! You really know this!";
     if (percentage >= 60) return "Nice work! Keep it up!";
     if (percentage >= 40) return "Good effort! Review and try again!";
     return "Keep studying, you've got this!";
-  };
-    setAnswers(new Array(quiz.length).fill(null));
-    setRevealed(new Array(quiz.length).fill(false));
   };
 
   const getOptionState = (qIdx: number, option: string): AnswerState => {
@@ -98,6 +98,18 @@ export default function QuizSection({ quiz }: Props) {
               {score}/{quiz.length} correct
             </span>
           </div>
+        )}
+        
+        {allAnswered && (
+          <p style={{
+            width: "100%",
+            textAlign: "center",
+            fontSize: "0.9rem",
+            color: "var(--color-text-muted)",
+            marginTop: "0.5rem",
+          }}>
+            {getMotivationalMessage()}
+          </p>
         )}
         
         {allAnswered &&  (
