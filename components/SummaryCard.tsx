@@ -55,6 +55,11 @@ export default function SummaryCard({ result }: Props) {
             >
               {result.summaryLength}
             </span>
+            
+            <span style={{ fontSize: "0.82rem", color: "var(--color-text-muted)" }}>
+            {readingTimeText}
+            </span>
+            
             <a
               href={result.videoUrl}
               target="_blank"
