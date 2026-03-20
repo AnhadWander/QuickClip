@@ -21,7 +21,7 @@ import {
 import { segmentsToTimestampedText } from "./transcript";
 import { MOCK_SUMMARY_RESULT } from "./mockData";
 
-// ─── Provider Selection ────────────────────────────────────────────────────────
+// LLM setup
 
 type LLMProvider = "gemini" | "openai";
 
@@ -38,7 +38,7 @@ function isMockMode(): boolean {
   );
 }
 
-// ─── Main Orchestrator ─────────────────────────────────────────────────────────
+// main function
 
 /**
  * Summarize a transcript using the configured LLM provider.
@@ -64,7 +64,7 @@ export async function summarizeTranscript(
 
   const timestampedText = segmentsToTimestampedText(segments);
 
-  let combinedTranscriptForFinal: string;
+  let fullText: string;
 
   if (needsChunking(segments)) {
     console.log("[LLM] Long transcript detected – using map-reduce approach.");
@@ -78,16 +78,16 @@ export async function summarizeTranscript(
       })
     );
 
-    combinedTranscriptForFinal = combineChunkSummaries(chunkSummaries);
+    fullText = combineChunkSummaries(chunkSummaries);
   } else {
-    combinedTranscriptForFinal = timestampedText;
+    fullText = timestampedText;
   }
 
   const lastSegment = segments[segments.length - 1];
   const totalDuration = lastSegment ? lastSegment.start + lastSegment.duration : 0;
 
   const result = await generateFinalSummary(
-    combinedTranscriptForFinal,
+    fullText,
     summaryLength,
     videoTitle,
     totalDuration
@@ -102,7 +102,7 @@ export async function summarizeTranscript(
   };
 }
 
-// ─── Chunk Summarization ───────────────────────────────────────────────────────
+// chunk processing
 
 async function summarizeChunk(
   chunkText: string,
@@ -114,7 +114,7 @@ async function summarizeChunk(
   return raw;
 }
 
-// ─── Final Summary Generation ──────────────────────────────────────────────────
+// final generation
 
 async function generateFinalSummary(
   transcriptText: string,
@@ -144,7 +144,7 @@ async function generateFinalSummary(
   }
 }
 
-// ─── LLM Dispatcher ───────────────────────────────────────────────────────────
+// helpers
 
 async function callLLM(prompt: string): Promise<string> {
   const provider = getProvider();
@@ -155,7 +155,7 @@ async function callLLM(prompt: string): Promise<string> {
   return callGemini(prompt);
 }
 
-// ─── Gemini Integration ────────────────────────────────────────────────────────
+// gemini functions
 
 async function callGemini(prompt: string): Promise<string> {
   const { GoogleGenerativeAI } = await import("@google/generative-ai");
@@ -192,7 +192,7 @@ async function callGemini(prompt: string): Promise<string> {
   }
 }
 
-// ─── OpenAI Integration ────────────────────────────────────────────────────────
+// openai functions
 
 async function callOpenAI(prompt: string): Promise<string> {
   const { OpenAI } = await import("openai");
@@ -217,7 +217,7 @@ async function callOpenAI(prompt: string): Promise<string> {
   return response.choices[0]?.message?.content || "";
 }
 
-// ─── Prompt Builders ───────────────────────────────────────────────────────────
+// prompt strings
 
 function buildChunkPrompt(
   chunkText: string,
@@ -244,34 +244,34 @@ function buildFinalPrompt(
   videoTitle: string,
   duration: number
 ): string {
-  const durationMin = Math.max(1, Math.round(duration / 60));
+  const mins = Math.max(1, Math.round(duration / 60));
   
-  let lengthInstruction = "";
+  let instructions = "";
   let keyPointCount = 0;
   let quizCount = 0;
   let timestampCount = 0;
 
   if (summaryLength === "brief") {
     // Scaling brief: roughly 1 sentence per 2 mins, cap at 6
-    const sentences = Math.min(6, Math.max(3, Math.ceil(durationMin / 2)));
-    lengthInstruction = `${sentences} short, concise sentences.`;
-    keyPointCount = Math.min(5, Math.max(3, Math.ceil(durationMin / 3)));
+    const sentences = Math.min(6, Math.max(3, Math.ceil(mins / 2)));
+    instructions = `${sentences} short, concise sentences.`;
+    keyPointCount = Math.min(5, Math.max(3, Math.ceil(mins / 3)));
     quizCount = 3;
-    timestampCount = Math.min(5, Math.max(3, Math.ceil(durationMin / 4)));
+    timestampCount = Math.min(5, Math.max(3, Math.ceil(mins / 4)));
   } else if (summaryLength === "standard") {
     // Scaling standard: roughly 1 section per 4 mins
-    const sections = Math.min(5, Math.max(2, Math.ceil(durationMin / 4)));
-    lengthInstruction = `${sections} distinct sections (total ${sections * 4}–${sections * 6} sentences). Use Markdown headers (###) and bolding to make it skimmable.`;
-    keyPointCount = Math.min(10, Math.max(5, Math.ceil(durationMin / 2)));
+    const sections = Math.min(5, Math.max(2, Math.ceil(mins / 4)));
+    instructions = `${sections} distinct sections (total ${sections * 4}–${sections * 6} sentences). Use Markdown headers (###) and bolding to make it skimmable.`;
+    keyPointCount = Math.min(10, Math.max(5, Math.ceil(mins / 2)));
     quizCount = 5;
-    timestampCount = Math.min(8, Math.max(4, Math.ceil(durationMin / 2)));
+    timestampCount = Math.min(8, Math.max(4, Math.ceil(mins / 2)));
   } else {
     // Scaling detailed: roughly 1 section per 2-3 mins
-    const sections = Math.min(10, Math.max(4, Math.ceil(durationMin / 2.5)));
-    lengthInstruction = `${sections} distinct, in-depth sections (total ${sections * 6}–${sections * 10} sentences). This must be a comprehensive breakdown of every major point in this ${durationMin}-minute video. Use Markdown headers (###), bolding, and bullet lists for maximum depth.`;
-    keyPointCount = Math.min(15, Math.max(8, durationMin));
-    quizCount = Math.min(12, Math.max(7, Math.ceil(durationMin / 1.5)));
-    timestampCount = Math.min(15, Math.max(6, durationMin));
+    const sections = Math.min(10, Math.max(4, Math.ceil(mins / 2.5)));
+    instructions = `${sections} distinct, in-depth sections (total ${sections * 6}–${sections * 10} sentences). This must be a comprehensive breakdown of every major point in this ${mins}-minute video. Use Markdown headers (###), bolding, and bullet lists for maximum depth.`;
+    keyPointCount = Math.min(15, Math.max(8, mins));
+    quizCount = Math.min(12, Math.max(7, Math.ceil(mins / 1.5)));
+    timestampCount = Math.min(15, Math.max(6, mins));
   }
 
   return `You are an expert video summarizer for students and researchers. Analyze the following transcript (which may be a collection of segment summaries) and generate structured study notes.
@@ -279,7 +279,7 @@ function buildFinalPrompt(
 CRITICAL RULES — YOU MUST FOLLOW ALL OF THESE:
 1. Use ONLY information explicitly found in the transcript segments below.
 2. Do NOT use any outside knowledge or general facts about the topic.
-3. Your overallSummary MUST BE ${lengthInstruction} Use raw newline characters (\\n\\n) to separate sections. Use Markdown formatting (headers, bolding, lists) WITHIN the JSON string value for overallSummary.
+3. Your overallSummary MUST BE ${instructions} Use raw newline characters (\\n\\n) to separate sections. Use Markdown formatting (headers, bolding, lists) WITHIN the JSON string value for overallSummary.
 4. Your overallSummary must cover the ENTIRE video from start to finish.
 5. Do NOT invent timestamps — all timestamps must correspond to actual [MM:SS] markers in the segments.
 6. If the transcript is unclear or incomplete, say so in the overallSummary.

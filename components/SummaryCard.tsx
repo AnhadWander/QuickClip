@@ -1,8 +1,8 @@
 "use client";
 
-/**
- * components/SummaryCard.tsx
- * Displays the video info and overall summary.
+/*
+ * SummaryCard.tsx
+ * Shows the video details and main summary
  */
 
 import Image from "next/image";
@@ -15,7 +15,7 @@ interface Props {
 }
 
 export default function SummaryCard({ result }: Props) {
-  const lengthColors = {
+  const colorMap = {
     brief: "#22c55e",
     standard: "#6366f1",
     detailed: "#a78bfa",
@@ -23,7 +23,6 @@ export default function SummaryCard({ result }: Props) {
 
   return (
     <div className="flex flex-col gap-5">
-      {/* Video info row */}
       <div className="section-card fade-in-up flex gap-5 items-start flex-wrap">
         {result.thumbnailUrl && (
           <div style={{ position: "relative", width: 180, height: 101, flexShrink: 0, borderRadius: 10, overflow: "hidden", border: "1px solid var(--color-border)" }}>
@@ -45,9 +44,9 @@ export default function SummaryCard({ result }: Props) {
             <span
               className="badge"
               style={{
-                background: `${lengthColors[result.summaryLength]}18`,
-                color: lengthColors[result.summaryLength],
-                border: `1px solid ${lengthColors[result.summaryLength]}33`,
+                background: `${colorMap[result.summaryLength]}18`,
+                color: colorMap[result.summaryLength],
+                border: `1px solid ${colorMap[result.summaryLength]}33`,
               }}
             >
               {result.summaryLength}
@@ -67,7 +66,7 @@ export default function SummaryCard({ result }: Props) {
         </div>
       </div>
 
-      {/* Summary section */}
+
       <div className="section-card fade-in-up fade-in-up-delay-1">
         <div className="flex items-center gap-[0.6rem] mb-4">
           <div className="p-[0.35rem] rounded-lg bg-[rgba(99,102,241,0.15)]">
