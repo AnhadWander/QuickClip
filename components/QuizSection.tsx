@@ -134,7 +134,7 @@ export default function QuizSection({ quiz }: Props) {
         
       </div>
 
-           {/* Progress Bar */}
+      {/* Progress Bar */}
       <div style={{
         width: "100%",
         height: 6,
@@ -147,7 +147,15 @@ export default function QuizSection({ quiz }: Props) {
           height: "100%",
           width: `${progressPercent}%`,
           borderRadius: 999,
-          background: "linear-gradient(90deg, #6366f1, #a78bfa)",
+          background: answeredCount === 0
+            ? "linear-gradient(90deg, #6366f1, #a78bfa)"
+            : progressPercent === 100 && (score / quiz.length) >= 0.8
+            ? "linear-gradient(90deg, #22c55e, #4ade80)"
+            : progressPercent === 100 && (score / quiz.length) >= 0.5
+            ? "linear-gradient(90deg, #f59e0b, #fbbf24)"
+            : progressPercent === 100
+            ? "linear-gradient(90deg, #f87171, #ef4444)"
+            : "linear-gradient(90deg, #6366f1, #a78bfa)",
           transition: "width 0.4s ease",
         }} />
       </div>
