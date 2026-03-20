@@ -152,6 +152,23 @@ export default function QuizSection({ quiz }: Props) {
         }} />
       </div>
 
+       {/* Congratulations Banner */}
+      {allAnswered && score === quiz.length && (
+        <div style={{
+          padding: "1rem",
+          borderRadius: 12,
+          background: "rgba(250,204,21,0.08)",
+          border: "1px solid rgba(250,204,21,0.25)",
+          textAlign: "center",
+          marginBottom: "1.5rem",
+          fontSize: "1rem",
+          fontWeight: 700,
+          color: "#fbbf24",
+        }}>
+          Perfect Score! You answered every question correctly!
+        </div>
+      )}
+
       {/* Questions */}
       <div style={{ display: "flex", flexDirection: "column", gap: "2rem" }}>
         {quiz.map((q, qIdx) => (
