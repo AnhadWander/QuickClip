@@ -7,8 +7,9 @@
 
 import Image from "next/image";
 import type { SummaryResult } from "@/lib/types";
-import { ExternalLink, BookOpen } from "lucide-react";
 import ReactMarkdown from "react-markdown";
+import { ExternalLink, BookOpen, Clock } from "lucide-react";
+
 
 interface Props {
   result: SummaryResult;
@@ -20,6 +21,10 @@ export default function SummaryCard({ result }: Props) {
     standard: "#6366f1",
     detailed: "#a78bfa",
   };
+
+  const wordCount = result.overallSummary.trim().split(/\s+/).length;
+  const readingTimeMinutes = Math.ceil(wordCount / 200);
+  const readingTimeText = readingTimeMinutes < 1 ? "< 1 min read" : `~${readingTimeMinutes} min read`;
 
   return (
     <div className="flex flex-col gap-5">
@@ -51,6 +56,12 @@ export default function SummaryCard({ result }: Props) {
             >
               {result.summaryLength}
             </span>
+            
+           <span style={{ display: "flex", alignItems: "center", gap: "0.3rem", fontSize: "0.82rem", color: "var(--color-text-muted)" }}>
+            <Clock size={13} />
+            {readingTimeText}
+              </span>
+
             <a
               href={result.videoUrl}
               target="_blank"
