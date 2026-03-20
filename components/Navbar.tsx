@@ -35,6 +35,7 @@ export default function Navbar() {
 
   return (
     <nav
+      aria-label="Main Navigation"
       style={{
         position: "fixed",
         top: 0,
@@ -49,7 +50,7 @@ export default function Navbar() {
     >
       <div className="container-app" style={{ display: "flex", alignItems: "center", justifyContent: "space-between", height: "64px" }}>
         {/* Logo */}
-        <Link href="/" style={{ display: "flex", alignItems: "center", gap: "0.5rem", textDecoration: "none" }}>
+        <Link href="/" aria-label="QuickClip Home Page" style={{ display: "flex", alignItems: "center", gap: "0.5rem", textDecoration: "none" }}>
           <div style={{
             width: 34, height: 34, borderRadius: 10,
             background: "linear-gradient(135deg, #6366f1, #a78bfa)",
@@ -69,7 +70,7 @@ export default function Navbar() {
             <>
               {user ? (
                 <>
-                  <Link href="/history" className="btn-ghost" style={{ display: "flex", alignItems: "center", gap: "0.4rem", textDecoration: "none", fontSize: "0.9rem" }}>
+                  <Link href="/history" aria-label="View your previous summaries" className="btn-ghost" style={{ display: "flex", alignItems: "center", gap: "0.4rem", textDecoration: "none", fontSize: "0.9rem" }}>
                     <History size={16} />
                     History
                   </Link>
