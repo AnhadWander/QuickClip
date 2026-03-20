@@ -77,9 +77,11 @@ export async function POST(req: NextRequest) {
     }
 
     // ── 5. Generate summary via LLM ──────────────────────────────────────────
-    console.log(`[API] Dispatching to LLM (${summaryLength} summary)...`);
+    console.log(`[API] Dispatching to LLM (${summaryLength} summary) for video: ${metadata.title}...`);
 
-    // ── 5. Generate summary via LLM ──────────────────────────────────────────
+    if (segments.length === 0) {
+      console.warn("[API] Warning: Segments array is empty. This might result in a poor summary.");
+    }
 
     let result;
     try {
