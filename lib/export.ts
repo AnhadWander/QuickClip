@@ -171,6 +171,14 @@ export async function exportAsPdf(result: SummaryResult): Promise<void> {
   doc.save(`quickclip-${filename}.pdf`);
 }
 
+/**
+ * Copy summary to clipboard as formatted text.
+ */
+export async function exportAsClipboard(result: SummaryResult): Promise<void> {
+  const content = buildTxtContent(result);
+  await navigator.clipboard.writeText(content);
+}
+
 // ─── Helpers ───────────────────────────────────────────────────────────────────
 
 function buildTxtContent(result: SummaryResult): string {
