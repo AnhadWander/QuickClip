@@ -6,7 +6,7 @@
  */
 
 import { useState } from "react";
-import { FileText, Download, Loader2 } from "lucide-react";
+import { FileText, Download, Loader2, Copy } from "lucide-react";
 import type { SummaryResult } from "@/lib/types";
 import toast from "react-hot-toast";
 
@@ -41,8 +41,26 @@ export default function ExportButtons({ result }: Props) {
     }
   };
 
+  const handleCopy = async () => {
+    try {
+      const { exportAsClipboard } = await import("@/lib/export");
+      await exportAsClipboard(result);
+      toast.success("Copied to clipboard!");
+    } catch {
+      toast.error("Failed to copy to clipboard");
+    }
+  };
+
   return (
     <div style={{ display: "flex", gap: "0.75rem", flexWrap: "wrap" }}>
+      <button
+        onClick={handleCopy}
+        className="btn-secondary"
+        style={{ fontSize: "0.88rem", padding: "0.6rem 1.25rem" }}
+      >
+        <Copy size={15} />
+        Copy
+      </button>
       <button
         onClick={handleTxt}
         className="btn-secondary"
