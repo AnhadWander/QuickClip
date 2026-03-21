@@ -1,25 +1,45 @@
 /**
  * lib/transcript.ts
  * Retrieves the transcript for a YouTube video.
- * Uses the `youtube-transcript` npm package directly (no Python needed).
+ * Uses the Supadata API to fetch transcripts reliably from any server.
  */
 
-import { YoutubeTranscript } from "youtube-transcript";
 import type { TranscriptSegment } from "./types";
 
 /**
  * Fetch the transcript for a given YouTube video ID.
- * Uses the youtube-transcript npm package directly.
+ * Uses Supadata API which works from cloud/server environments.
  */
 export async function getTranscript(videoId: string): Promise<TranscriptSegment[]> {
-  try {
-    const rawTranscript = await YoutubeTranscript.fetchTranscript(videoId);
+  const apiKey = process.env.SUPADATA_API_KEY;
 
-    if (!rawTranscript || rawTranscript.length === 0) {
+  if (!apiKey) {
+    throw new Error("SUPADATA_API_KEY is not set.");
+  }
+
+  const videoUrl = `https://www.youtube.com/watch?v=${videoId}`;
+
+  try {
+    const response = await fetch(
+      `https://api.supadata.ai/v1/transcript?url=${encodeURIComponent(videoUrl)}`,
+      {
+        headers: {
+          "x-api-key": apiKey,
+        },
+      }
+    );
+
+    if (!response.ok) {
+      throw new Error(`Supadata API error: ${response.status}`);
+    }
+
+    const data = await response.json();
+
+    if (!data.content || data.content.length === 0) {
       throw new Error("Transcript is empty or unavailable for this video.");
     }
 
-    return rawTranscript.map((item) => ({
+    return data.content.map((item: any) => ({
       text: cleanTranscriptText(item.text),
       start: item.offset / 1000,
       duration: item.duration / 1000,
@@ -34,7 +54,6 @@ export async function getTranscript(videoId: string): Promise<TranscriptSegment[
 
 /**
  * Convert transcript segments into a flat string with approximate timestamps.
- * Used for LLM input when we want readable timestamped text.
  */
 export function segmentsToTimestampedText(segments: TranscriptSegment[]): string {
   return segments
@@ -47,7 +66,6 @@ export function segmentsToTimestampedText(segments: TranscriptSegment[]): string
 
 /**
  * Convert transcript segments into a plain text string (no timestamps).
- * Used for summarization when timestamps are not needed in the prompt.
  */
 export function segmentsToPlainText(segments: TranscriptSegment[]): string {
   return segments.map((seg) => seg.text).join(" ");
