@@ -13,6 +13,23 @@ import type { TranscriptSegment } from "./types";
  * Uses a Python bridge script to call youtube-transcript-api.
  */
 export async function getTranscript(videoId: string): Promise<TranscriptSegment[]> {
+  // If deployed with a standalone Python backend, use its URL
+  const backendUrl = process.env.PYTHON_BACKEND_URL;
+  if (backendUrl) {
+    return fetch(`${backendUrl}/api/transcript?videoId=${videoId}`)
+      .then(async (res) => {
+        const data = await res.json();
+        if (!res.ok) {
+          throw new Error(data.error || "Failed to fetch transcript from backend");
+        }
+        if (data.error) throw new Error(data.error);
+        if (!Array.isArray(data) || data.length === 0) {
+          throw new Error("Transcript is empty or unavailable for this video.");
+        }
+        return data as TranscriptSegment[];
+      });
+  }
+
   return new Promise((resolve, reject) => {
     // Path to the python interpreter in the venv
     const pythonPath = path.join(process.cwd(), "venv", "bin", "python3");
