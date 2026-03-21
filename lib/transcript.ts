@@ -1,64 +1,35 @@
 /**
  * lib/transcript.ts
  * Retrieves the transcript for a YouTube video.
- * Uses the `youtube-transcript` npm package.
+ * Uses the `youtube-transcript` npm package directly (no Python needed).
  */
 
-import { exec } from "child_process";
-import path from "path";
+import { YoutubeTranscript } from "youtube-transcript";
 import type { TranscriptSegment } from "./types";
 
 /**
  * Fetch the transcript for a given YouTube video ID.
- * Uses a Python bridge script to call youtube-transcript-api.
+ * Uses the youtube-transcript npm package directly.
  */
 export async function getTranscript(videoId: string): Promise<TranscriptSegment[]> {
-  // If deployed with a standalone Python backend, use its URL
-  const backendUrl = process.env.PYTHON_BACKEND_URL;
-  if (backendUrl) {
-    return fetch(`${backendUrl}/api/transcript?videoId=${videoId}`)
-      .then(async (res) => {
-        const data = await res.json();
-        if (!res.ok) {
-          throw new Error(data.error || "Failed to fetch transcript from backend");
-        }
-        if (data.error) throw new Error(data.error);
-        if (!Array.isArray(data) || data.length === 0) {
-          throw new Error("Transcript is empty or unavailable for this video.");
-        }
-        return data as TranscriptSegment[];
-      });
+  try {
+    const rawTranscript = await YoutubeTranscript.fetchTranscript(videoId);
+
+    if (!rawTranscript || rawTranscript.length === 0) {
+      throw new Error("Transcript is empty or unavailable for this video.");
+    }
+
+    return rawTranscript.map((item) => ({
+      text: cleanTranscriptText(item.text),
+      start: item.offset / 1000,
+      duration: item.duration / 1000,
+    }));
+  } catch (error: any) {
+    console.error(`[getTranscript] Error: ${error.message}`);
+    throw new Error(
+      "No transcript is available for this video. This may be because captions are disabled, the video is private, or the language is not supported."
+    );
   }
-
-  return new Promise((resolve, reject) => {
-    // Path to the python interpreter in the venv
-    const pythonPath = path.join(process.cwd(), "venv", "bin", "python3");
-    const scriptPath = path.join(process.cwd(), "python", "get_transcript.py");
-
-    exec(`"${pythonPath}" "${scriptPath}" ${videoId}`, (error, stdout, stderr) => {
-      if (error) {
-        console.error(`[getTranscript] Python error: ${stderr}`);
-        return reject(new Error("No transcript is available for this video. This may be because captions are disabled, the video is private, or the language is not supported."));
-      }
-
-      try {
-        const data = JSON.parse(stdout);
-        
-        if (data.error) {
-          return reject(new Error(data.error));
-        }
-
-        if (!Array.isArray(data) || data.length === 0) {
-          return reject(new Error("Transcript is empty or unavailable for this video."));
-        }
-
-        resolve(data as TranscriptSegment[]);
-      } catch (parseError) {
-        console.error(`[getTranscript] JSON parse error: ${parseError}`);
-        reject(new Error("Failed to parse transcript data accurately."));
-      }
-    });
-  });
 }
 
 /**
