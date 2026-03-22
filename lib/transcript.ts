@@ -1,52 +1,59 @@
 /**
  * lib/transcript.ts
  * Retrieves the transcript for a YouTube video.
- * Uses the `youtube-transcript` npm package.
+ * Uses the Supadata API to fetch transcripts reliably from any server.
  */
 
-import { exec } from "child_process";
-import path from "path";
 import type { TranscriptSegment } from "./types";
 
 /**
  * Fetch the transcript for a given YouTube video ID.
- * Uses a Python bridge script to call youtube-transcript-api.
+ * Uses Supadata API which works from cloud/server environments.
  */
 export async function getTranscript(videoId: string): Promise<TranscriptSegment[]> {
-  return new Promise((resolve, reject) => {
-    // Path to the python interpreter in the venv
-    const pythonPath = path.join(process.cwd(), "venv", "bin", "python3");
-    const scriptPath = path.join(process.cwd(), "python", "get_transcript.py");
+  const apiKey = process.env.SUPADATA_API_KEY;
 
-    exec(`"${pythonPath}" "${scriptPath}" ${videoId}`, (error, stdout, stderr) => {
-      if (error) {
-        console.error(`[getTranscript] Python error: ${stderr}`);
-        return reject(new Error("No transcript is available for this video. This may be because captions are disabled, the video is private, or the language is not supported."));
+  if (!apiKey) {
+    throw new Error("SUPADATA_API_KEY is not set.");
+  }
+
+  const videoUrl = `https://www.youtube.com/watch?v=${videoId}`;
+
+  try {
+    const response = await fetch(
+      `https://api.supadata.ai/v1/transcript?url=${encodeURIComponent(videoUrl)}`,
+      {
+        headers: {
+          "x-api-key": apiKey,
+        },
       }
+    );
 
-      try {
-        const data = JSON.parse(stdout);
-        
-        if (data.error) {
-          return reject(new Error(data.error));
-        }
+    if (!response.ok) {
+      throw new Error(`Supadata API error: ${response.status}`);
+    }
 
-        if (!Array.isArray(data) || data.length === 0) {
-          return reject(new Error("Transcript is empty or unavailable for this video."));
-        }
+    const data = await response.json();
 
-        resolve(data as TranscriptSegment[]);
-      } catch (parseError) {
-        console.error(`[getTranscript] JSON parse error: ${parseError}`);
-        reject(new Error("Failed to parse transcript data accurately."));
-      }
-    });
-  });
+    if (!data.content || data.content.length === 0) {
+      throw new Error("Transcript is empty or unavailable for this video.");
+    }
+
+    return data.content.map((item: any) => ({
+      text: cleanTranscriptText(item.text),
+      start: item.offset / 1000,
+      duration: item.duration / 1000,
+    }));
+  } catch (error: any) {
+    console.error(`[getTranscript] Error: ${error.message}`);
+    throw new Error(
+      "No transcript is available for this video. This may be because captions are disabled, the video is private, or the language is not supported."
+    );
+  }
 }
 
 /**
  * Convert transcript segments into a flat string with approximate timestamps.
- * Used for LLM input when we want readable timestamped text.
  */
 export function segmentsToTimestampedText(segments: TranscriptSegment[]): string {
   return segments
@@ -59,7 +66,6 @@ export function segmentsToTimestampedText(segments: TranscriptSegment[]): string
 
 /**
  * Convert transcript segments into a plain text string (no timestamps).
- * Used for summarization when timestamps are not needed in the prompt.
  */
 export function segmentsToPlainText(segments: TranscriptSegment[]): string {
   return segments.map((seg) => seg.text).join(" ");
