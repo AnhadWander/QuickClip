@@ -13,6 +13,9 @@ interface Props {
   videoUrl: string;
 }
 
+/**
+ * Converts a time string (HH:MM:SS or MM:SS) into total seconds
+ */
 function timeToSeconds(timeStr: string): number {
   const parts = timeStr.split(":").map(Number);
   if (parts.length === 3) return parts[0] * 3600 + parts[1] * 60 + parts[2];
@@ -20,6 +23,9 @@ function timeToSeconds(timeStr: string): number {
   return 0;
 }
 
+/**
+ * Builds a YouTube URL with a timestamp query parameter
+ */
 function buildTimestampUrl(videoUrl: string, timeStr: string): string {
   const seconds = timeToSeconds(timeStr);
   try {
@@ -36,11 +42,32 @@ export default function TimestampList({ timestamps, videoUrl }: Props) {
 
   return (
     <div className="section-card fade-in-up fade-in-up-delay-3">
-      <div style={{ display: "flex", alignItems: "center", gap: "0.6rem", marginBottom: "1.25rem" }}>
-        <div style={{ padding: "0.35rem", borderRadius: 8, background: "rgba(99,102,241,0.12)" }}>
+      <div
+        style={{
+          display: "flex",
+          alignItems: "center",
+          gap: "0.6rem",
+          marginBottom: "1.25rem",
+        }}
+      >
+        <div
+          style={{
+            padding: "0.35rem",
+            borderRadius: 8,
+            background: "rgba(99,102,241,0.12)",
+          }}
+        >
           <Clock size={16} color="var(--color-primary)" />
         </div>
-        <h3 style={{ fontSize: "0.95rem", fontWeight: 700, color: "var(--color-text)", textTransform: "uppercase", letterSpacing: "0.05em" }}>
+        <h3
+          style={{
+            fontSize: "0.95rem",
+            fontWeight: 700,
+            color: "var(--color-text)",
+            textTransform: "uppercase",
+            letterSpacing: "0.05em",
+          }}
+        >
           Timestamps
         </h3>
       </div>
@@ -79,14 +106,30 @@ export default function TimestampList({ timestamps, videoUrl }: Props) {
                 el.style.transform = "translateX(0)";
               }}
             >
-              <span className="timestamp-chip" style={{ flexShrink: 0, textDecoration: "none" }}>
+              <span
+                className="timestamp-chip"
+                style={{ flexShrink: 0, textDecoration: "none" }}
+              >
                 {ts.time}
               </span>
               <div>
-                <div style={{ fontWeight: 600, color: "var(--color-text)", fontSize: "0.92rem", marginBottom: "0.2rem" }}>
+                <div
+                  style={{
+                    fontWeight: 600,
+                    color: "var(--color-text)",
+                    fontSize: "0.92rem",
+                    marginBottom: "0.2rem",
+                  }}
+                >
                   {ts.label}
                 </div>
-                <div style={{ color: "var(--color-text-muted)", fontSize: "0.85rem", lineHeight: 1.5 }}>
+                <div
+                  style={{
+                    color: "var(--color-text-muted)",
+                    fontSize: "0.85rem",
+                    lineHeight: 1.5,
+                  }}
+                >
                   {ts.description}
                 </div>
               </div>

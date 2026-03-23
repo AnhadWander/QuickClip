@@ -17,15 +17,21 @@ interface Props {
 type AnswerState = "unanswered" | "correct" | "incorrect";
 
 export default function QuizSection({ quiz }: Props) {
+  // Stores the user's selected answer for each question.
+  // A null value means the question has not been answered yet.
   const [answers, setAnswers] = useState<(string | null)[]>(
-    new Array(quiz.length).fill(null)
+    new Array(quiz.length).fill(null),
   );
+
+  // Tracks whether each question has been revealed/locked after answering.
+  // Once revealed, the user can no longer change that answer.
   const [revealed, setRevealed] = useState<boolean[]>(
-    new Array(quiz.length).fill(false)
+    new Array(quiz.length).fill(false),
   );
 
   if (!quiz?.length) return null;
 
+  // Handles selecting an answer for a question.
   const handleAnswer = (qIdx: number, option: string) => {
     if (revealed[qIdx]) return; // Can't change after reveal
     const newAnswers = [...answers];
@@ -37,18 +43,18 @@ export default function QuizSection({ quiz }: Props) {
     setRevealed(newRevealed);
   };
 
-  const score = answers.filter(
-    (a, i) => a === quiz[i].correctAnswer
-  ).length;
+  const score = answers.filter((a, i) => a === quiz[i].correctAnswer).length;
 
   const allAnswered = revealed.every(Boolean);
+  // Tracks quiz completion progress for the progress bar.
   const answeredCount = revealed.filter(Boolean).length;
   const progressPercent = (answeredCount / quiz.length) * 100;
-   const handleRetake = () => {
+  const handleRetake = () => {
     setAnswers(new Array(quiz.length).fill(null));
     setRevealed(new Array(quiz.length).fill(false));
   };
-   const getMotivationalMessage = () => {
+  // Returns a feedback message based on the user's final score percentage.
+  const getMotivationalMessage = () => {
     const percentage = (score / quiz.length) * 100;
     if (percentage === 100) return "Perfect score!";
     if (percentage >= 80) return "Great job! You really know this!";
@@ -69,14 +75,14 @@ export default function QuizSection({ quiz }: Props) {
       state === "correct"
         ? "var(--color-success)"
         : state === "incorrect"
-        ? "var(--color-error)"
-        : "var(--color-border)",
+          ? "var(--color-error)"
+          : "var(--color-border)",
     background:
       state === "correct"
         ? "rgba(34,197,94,0.08)"
         : state === "incorrect"
-        ? "rgba(248,113,113,0.08)"
-        : "var(--color-surface-2)",
+          ? "rgba(248,113,113,0.08)"
+          : "var(--color-surface-2)",
   });
 
   const letters = ["A", "B", "C", "D"];
@@ -84,17 +90,51 @@ export default function QuizSection({ quiz }: Props) {
   return (
     <div className="section-card fade-in-up fade-in-up-delay-4">
       {/* Header */}
-      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "1.5rem", flexWrap: "wrap", gap: "0.75rem" }}>
+      <div
+        style={{
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "space-between",
+          marginBottom: "1.5rem",
+          flexWrap: "wrap",
+          gap: "0.75rem",
+        }}
+      >
         <div style={{ display: "flex", alignItems: "center", gap: "0.6rem" }}>
-          <div style={{ padding: "0.35rem", borderRadius: 8, background: "rgba(167,139,250,0.12)" }}>
+          <div
+            style={{
+              padding: "0.35rem",
+              borderRadius: 8,
+              background: "rgba(167,139,250,0.12)",
+            }}
+          >
             <Brain size={16} color="var(--color-accent)" />
           </div>
-          <h3 style={{ fontSize: "0.95rem", fontWeight: 700, color: "var(--color-text)", textTransform: "uppercase", letterSpacing: "0.05em" }}>
+          <h3
+            style={{
+              fontSize: "0.95rem",
+              fontWeight: 700,
+              color: "var(--color-text)",
+              textTransform: "uppercase",
+              letterSpacing: "0.05em",
+            }}
+          >
             Quiz
           </h3>
         </div>
         {allAnswered && score > 0 && (
-          <div style={{ display: "flex", alignItems: "center", gap: "0.5rem", padding: "0.4rem 0.9rem", borderRadius: 999, background: "rgba(250,204,21,0.1)", border: "1px solid rgba(250,204,21,0.25)", color: "#fbbf24" }}>
+          <div
+            style={{
+              display: "flex",
+              alignItems: "center",
+              gap: "0.5rem",
+              padding: "0.4rem 0.9rem",
+              borderRadius: 999,
+              background: "rgba(250,204,21,0.1)",
+              border: "1px solid rgba(250,204,21,0.25)",
+              color: "#fbbf24",
+            }}
+          >
             <Trophy size={15} />
             <span style={{ fontWeight: 700, fontSize: "0.88rem" }}>
               {score}/{quiz.length} correct
@@ -102,19 +142,21 @@ export default function QuizSection({ quiz }: Props) {
           </div>
         )}
 
-         {allAnswered && (
-          <p style={{
-            width: "100%",
-            textAlign: "center",
-            fontSize: "0.9rem",
-            color: "var(--color-text-muted)",
-            marginTop: "0.5rem",
-          }}>
+        {allAnswered && (
+          <p
+            style={{
+              width: "100%",
+              textAlign: "center",
+              fontSize: "0.9rem",
+              color: "var(--color-text-muted)",
+              marginTop: "0.5rem",
+            }}
+          >
             {getMotivationalMessage()}
           </p>
         )}
-        
-        {allAnswered &&  (
+
+        {allAnswered && (
           <button
             onClick={handleRetake}
             style={{
@@ -131,48 +173,54 @@ export default function QuizSection({ quiz }: Props) {
             Retake Quiz
           </button>
         )}
-        
       </div>
 
       {/* Progress Bar */}
-      <div style={{
-        width: "100%",
-        height: 6,
-        borderRadius: 999,
-        background: "var(--color-border)",
-        marginBottom: "1.5rem",
-        overflow: "hidden",
-      }}>
-        <div style={{
-          height: "100%",
-          width: `${progressPercent}%`,
+      <div
+        style={{
+          width: "100%",
+          height: 6,
           borderRadius: 999,
-          background: answeredCount === 0
-            ? "linear-gradient(90deg, #6366f1, #a78bfa)"
-            : progressPercent === 100 && (score / quiz.length) >= 0.8
-            ? "linear-gradient(90deg, #22c55e, #4ade80)"
-            : progressPercent === 100 && (score / quiz.length) >= 0.5
-            ? "linear-gradient(90deg, #f59e0b, #fbbf24)"
-            : progressPercent === 100
-            ? "linear-gradient(90deg, #f87171, #ef4444)"
-            : "linear-gradient(90deg, #6366f1, #a78bfa)",
-          transition: "width 0.4s ease",
-        }} />
+          background: "var(--color-border)",
+          marginBottom: "1.5rem",
+          overflow: "hidden",
+        }}
+      >
+        <div
+          style={{
+            height: "100%",
+            width: `${progressPercent}%`,
+            borderRadius: 999,
+            background:
+              answeredCount === 0
+                ? "linear-gradient(90deg, #6366f1, #a78bfa)"
+                : progressPercent === 100 && score / quiz.length >= 0.8
+                  ? "linear-gradient(90deg, #22c55e, #4ade80)"
+                  : progressPercent === 100 && score / quiz.length >= 0.5
+                    ? "linear-gradient(90deg, #f59e0b, #fbbf24)"
+                    : progressPercent === 100
+                      ? "linear-gradient(90deg, #f87171, #ef4444)"
+                      : "linear-gradient(90deg, #6366f1, #a78bfa)",
+            transition: "width 0.4s ease",
+          }}
+        />
       </div>
 
-       {/* Congratulations Banner */}
+      {/* Congratulations Banner */}
       {allAnswered && score === quiz.length && (
-        <div style={{
-          padding: "1rem",
-          borderRadius: 12,
-          background: "rgba(250,204,21,0.08)",
-          border: "1px solid rgba(250,204,21,0.25)",
-          textAlign: "center",
-          marginBottom: "1.5rem",
-          fontSize: "1rem",
-          fontWeight: 700,
-          color: "#fbbf24",
-        }}>
+        <div
+          style={{
+            padding: "1rem",
+            borderRadius: 12,
+            background: "rgba(250,204,21,0.08)",
+            border: "1px solid rgba(250,204,21,0.25)",
+            textAlign: "center",
+            marginBottom: "1.5rem",
+            fontSize: "1rem",
+            fontWeight: 700,
+            color: "#fbbf24",
+          }}
+        >
           Perfect Score! You answered every question correctly!
         </div>
       )}
@@ -181,14 +229,34 @@ export default function QuizSection({ quiz }: Props) {
       <div style={{ display: "flex", flexDirection: "column", gap: "2rem" }}>
         {quiz.map((q, qIdx) => (
           <div key={qIdx}>
-            <p style={{ fontWeight: 600, color: "var(--color-text)", marginBottom: "0.875rem", lineHeight: 1.5, fontSize: "0.97rem" }}>
-              <span style={{ color: "var(--color-accent)", marginRight: "0.4rem", fontFamily: "monospace" }}>
+            <p
+              style={{
+                fontWeight: 600,
+                color: "var(--color-text)",
+                marginBottom: "0.875rem",
+                lineHeight: 1.5,
+                fontSize: "0.97rem",
+              }}
+            >
+              <span
+                style={{
+                  color: "var(--color-accent)",
+                  marginRight: "0.4rem",
+                  fontFamily: "monospace",
+                }}
+              >
                 Q{qIdx + 1}.
               </span>
               {q.question}
             </p>
 
-            <div style={{ display: "flex", flexDirection: "column", gap: "0.4rem" }}>
+            <div
+              style={{
+                display: "flex",
+                flexDirection: "column",
+                gap: "0.4rem",
+              }}
+            >
               {q.options.map((option, oIdx) => {
                 const state = getOptionState(qIdx, option);
                 return (
@@ -204,17 +272,47 @@ export default function QuizSection({ quiz }: Props) {
                       width: "100%",
                     }}
                   >
-                    <span style={{
-                      width: 24, height: 24, borderRadius: 6,
-                      background: state === "correct" ? "rgba(34,197,94,0.2)" : state === "incorrect" ? "rgba(248,113,113,0.2)" : "rgba(99,102,241,0.12)",
-                      border: `1px solid ${state === "correct" ? "rgba(34,197,94,0.4)" : state === "incorrect" ? "rgba(248,113,113,0.4)" : "rgba(99,102,241,0.25)"}`,
-                      display: "flex", alignItems: "center", justifyContent: "center",
-                      fontWeight: 700, fontSize: "0.72rem", flexShrink: 0,
-                      color: state === "correct" ? "var(--color-success)" : state === "incorrect" ? "var(--color-error)" : "var(--color-accent)",
-                    }}>
-                      {state === "correct" ? <CheckCircle2 size={14} /> : state === "incorrect" ? <XCircle size={14} /> : letters[oIdx]}
+                    <span
+                      style={{
+                        width: 24,
+                        height: 24,
+                        borderRadius: 6,
+                        background:
+                          state === "correct"
+                            ? "rgba(34,197,94,0.2)"
+                            : state === "incorrect"
+                              ? "rgba(248,113,113,0.2)"
+                              : "rgba(99,102,241,0.12)",
+                        border: `1px solid ${state === "correct" ? "rgba(34,197,94,0.4)" : state === "incorrect" ? "rgba(248,113,113,0.4)" : "rgba(99,102,241,0.25)"}`,
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        fontWeight: 700,
+                        fontSize: "0.72rem",
+                        flexShrink: 0,
+                        color:
+                          state === "correct"
+                            ? "var(--color-success)"
+                            : state === "incorrect"
+                              ? "var(--color-error)"
+                              : "var(--color-accent)",
+                      }}
+                    >
+                      {state === "correct" ? (
+                        <CheckCircle2 size={14} />
+                      ) : state === "incorrect" ? (
+                        <XCircle size={14} />
+                      ) : (
+                        letters[oIdx]
+                      )}
                     </span>
-                    <span style={{ color: "var(--color-text)", fontSize: "0.92rem", lineHeight: 1.4 }}>
+                    <span
+                      style={{
+                        color: "var(--color-text)",
+                        fontSize: "0.92rem",
+                        lineHeight: 1.4,
+                      }}
+                    >
                       {option}
                     </span>
                   </button>
@@ -224,17 +322,21 @@ export default function QuizSection({ quiz }: Props) {
 
             {/* Explanation */}
             {revealed[qIdx] && (
-              <div style={{
-                marginTop: "0.75rem",
-                padding: "0.75rem 1rem",
-                borderRadius: 10,
-                background: "rgba(99,102,241,0.06)",
-                border: "1px solid rgba(99,102,241,0.2)",
-                fontSize: "0.85rem",
-                color: "var(--color-text-muted)",
-                lineHeight: 1.6,
-              }}>
-                <span style={{ fontWeight: 600, color: "var(--color-accent)" }}>Explanation: </span>
+              <div
+                style={{
+                  marginTop: "0.75rem",
+                  padding: "0.75rem 1rem",
+                  borderRadius: 10,
+                  background: "rgba(99,102,241,0.06)",
+                  border: "1px solid rgba(99,102,241,0.2)",
+                  fontSize: "0.85rem",
+                  color: "var(--color-text-muted)",
+                  lineHeight: 1.6,
+                }}
+              >
+                <span style={{ fontWeight: 600, color: "var(--color-accent)" }}>
+                  Explanation:{" "}
+                </span>
                 {q.explanation}
               </div>
             )}
