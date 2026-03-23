@@ -48,7 +48,7 @@ export default function Navbar() {
         left: 0,
         right: 0,
         zIndex: 100,
-        background: "var(--color-bg)",
+        background: "rgba(255, 255, 255, 0.9)",
         borderBottom: "1px solid var(--color-border)",
       }}
     >
@@ -80,7 +80,7 @@ export default function Navbar() {
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
-              boxShadow: "0 4px 12px rgba(0,0,0,0.2)",
+              boxShadow: "0 2px 10px rgba(255, 69, 58, 0.3)",
             }}
           >
             <Zap size={18} color="white" strokeWidth={2.5} />

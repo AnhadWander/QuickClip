@@ -119,7 +119,7 @@ export default function SummaryCard({ result }: Props) {
 
       <div className="section-card fade-in-up fade-in-up-delay-1">
         <div className="flex items-center gap-[0.6rem] mb-4">
-          <div className="p-[0.35rem] rounded-lg bg-[rgba(255,69,58,0.15)]">
+          <div className="p-[0.35rem] rounded-lg bg-[rgba(255,69,58,0.1)]">
             <BookOpen size={16} color="var(--color-primary)" />
           </div>
           <h3 className="text-[0.95rem] font-bold text-[var(--color-text)] uppercase tracking-[0.05em]">

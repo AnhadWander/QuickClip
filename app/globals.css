@@ -2,22 +2,22 @@
 
 /* ─── Global Design Tokens ──────────────────────────────────────────────────── */
 :root {
-  --color-bg: #212121;
-  --color-surface: #2d2d2d;
-  --color-surface-2: #3a3a3a;
-  --color-border: #444444;
+  --color-bg: #ffffff;
+  --color-surface: #f9f9f9;
+  --color-surface-2: #f1f1f1;
+  --color-border: #e2e2e2;
   --color-primary: #ff453a;
   --color-primary-hover: #e03a30;
-  --color-primary-glow: rgba(255, 69, 58, 0.2);
+  --color-primary-glow: rgba(255, 69, 58, 0.1);
   --color-accent: #ff6961;
-  --color-text: #ff453a;
-  --color-text-muted: #d1615a;
-  --color-success: #22c55e;
-  --color-error: #f87171;
-  --color-warning: #fbbf24;
+  --color-text: #111111;
+  --color-text-muted: #6b6b6b;
+  --color-success: #16a34a;
+  --color-error: #dc2626;
+  --color-warning: #d97706;
   --radius: 8px;
   --radius-lg: 14px;
-  --shadow-glow: 0 4px 20px rgba(0, 0, 0, 0.3);
+  --shadow-glow: 0 4px 12px rgba(0, 0, 0, 0.05);
 }
 
 /* ─── Base Reset ────────────────────────────────────────────────────────────── */
