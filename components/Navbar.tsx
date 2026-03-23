@@ -48,9 +48,7 @@ export default function Navbar() {
         left: 0,
         right: 0,
         zIndex: 100,
-        background: "rgba(10, 10, 15, 0.85)",
-        backdropFilter: "blur(16px)",
-        WebkitBackdropFilter: "blur(16px)",
+        background: "var(--color-bg)",
         borderBottom: "1px solid var(--color-border)",
       }}
     >
@@ -78,11 +76,11 @@ export default function Navbar() {
               width: 34,
               height: 34,
               borderRadius: 10,
-              background: "linear-gradient(135deg, #6366f1, #a78bfa)",
+              background: "var(--color-primary)",
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
-              boxShadow: "0 0 15px rgba(99,102,241,0.4)",
+              boxShadow: "0 4px 12px rgba(0,0,0,0.2)",
             }}
           >
             <Zap size={18} color="white" strokeWidth={2.5} />
@@ -135,7 +133,7 @@ export default function Navbar() {
                         width: 34,
                         height: 34,
                         borderRadius: "50%",
-                        background: "linear-gradient(135deg, #6366f1, #a78bfa)",
+                        background: "var(--color-primary)",
                         display: "flex",
                         alignItems: "center",
                         justifyContent: "center",

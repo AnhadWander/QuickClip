@@ -105,7 +105,7 @@ export default function QuizSection({ quiz }: Props) {
             style={{
               padding: "0.35rem",
               borderRadius: 8,
-              background: "rgba(167,139,250,0.12)",
+              background: "rgba(255,105,97,0.12)",
             }}
           >
             <Brain size={16} color="var(--color-accent)" />
@@ -162,8 +162,8 @@ export default function QuizSection({ quiz }: Props) {
             style={{
               padding: "0.4rem 0.9rem",
               borderRadius: 999,
-              background: "rgba(99,102,241,0.15)",
-              border: "1px solid rgba(99,102,241,0.3)",
+              background: "rgba(255,69,58,0.15)",
+              border: "1px solid rgba(255,69,58,0.3)",
               color: "var(--color-accent)",
               fontWeight: 700,
               fontSize: "0.88rem",
@@ -193,14 +193,14 @@ export default function QuizSection({ quiz }: Props) {
             borderRadius: 999,
             background:
               answeredCount === 0
-                ? "linear-gradient(90deg, #6366f1, #a78bfa)"
+                ? "linear-gradient(90deg, #ff453a, #ff6961)"
                 : progressPercent === 100 && score / quiz.length >= 0.8
                   ? "linear-gradient(90deg, #22c55e, #4ade80)"
                   : progressPercent === 100 && score / quiz.length >= 0.5
                     ? "linear-gradient(90deg, #f59e0b, #fbbf24)"
                     : progressPercent === 100
                       ? "linear-gradient(90deg, #f87171, #ef4444)"
-                      : "linear-gradient(90deg, #6366f1, #a78bfa)",
+                      : "linear-gradient(90deg, #ff453a, #ff6961)",
             transition: "width 0.4s ease",
           }}
         />
@@ -282,8 +282,8 @@ export default function QuizSection({ quiz }: Props) {
                             ? "rgba(34,197,94,0.2)"
                             : state === "incorrect"
                               ? "rgba(248,113,113,0.2)"
-                              : "rgba(99,102,241,0.12)",
-                        border: `1px solid ${state === "correct" ? "rgba(34,197,94,0.4)" : state === "incorrect" ? "rgba(248,113,113,0.4)" : "rgba(99,102,241,0.25)"}`,
+                              : "rgba(255,69,58,0.12)",
+                        border: `1px solid ${state === "correct" ? "rgba(34,197,94,0.4)" : state === "incorrect" ? "rgba(248,113,113,0.4)" : "rgba(255,69,58,0.25)"}`,
                         display: "flex",
                         alignItems: "center",
                         justifyContent: "center",
@@ -327,8 +327,8 @@ export default function QuizSection({ quiz }: Props) {
                   marginTop: "0.75rem",
                   padding: "0.75rem 1rem",
                   borderRadius: 10,
-                  background: "rgba(99,102,241,0.06)",
-                  border: "1px solid rgba(99,102,241,0.2)",
+                  background: "rgba(255,69,58,0.06)",
+                  border: "1px solid rgba(255,69,58,0.2)",
                   fontSize: "0.85rem",
                   color: "var(--color-text-muted)",
                   lineHeight: 1.6,

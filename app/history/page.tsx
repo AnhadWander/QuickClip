@@ -104,7 +104,7 @@ export default function HistoryPage() {
     <div className="container-app" style={{ padding: "2.5rem 1.25rem 5rem" }}>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "2rem", flexWrap: "wrap", gap: "1rem" }}>
         <div style={{ display: "flex", alignItems: "center", gap: "0.75rem" }}>
-          <div style={{ padding: "0.5rem", borderRadius: 10, background: "rgba(99,102,241,0.15)" }}>
+          <div style={{ padding: "0.5rem", borderRadius: 10, background: "rgba(255,69,58,0.15)" }}>
             <History size={20} color="var(--color-primary)" />
           </div>
           <div>

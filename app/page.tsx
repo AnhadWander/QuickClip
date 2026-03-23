@@ -77,7 +77,7 @@ export default function HomePage() {
             QuickClip
           </h1>
           <p className="fade-in-up fade-in-up-delay-1" style={{ fontSize: "clamp(1rem, 2.5vw, 1.3rem)", color: "var(--color-text-muted)", maxWidth: 560, margin: "0 auto 3rem", lineHeight: 1.7 }}>
-            Turn any YouTube video into structured study notes, key insights, timestamps, and a quiz — instantly.
+            Turn any YouTube video into structured study notes, key insights, timestamps, and an instant quiz.
           </p>
 
           {/* input form */}
@@ -136,7 +136,7 @@ export default function HomePage() {
                       padding: "0.75rem",
                       borderRadius: 10,
                       border: summaryLength === value ? "2px solid var(--color-primary)" : "1px solid var(--color-border)",
-                      background: summaryLength === value ? "rgba(99,102,241,0.1)" : "var(--color-surface-2)",
+                      background: summaryLength === value ? "rgba(255,69,58,0.1)" : "var(--color-surface-2)",
                       cursor: "pointer",
                       transition: "all 0.15s ease",
                       textAlign: "left",
@@ -188,9 +188,9 @@ export default function HomePage() {
 
           <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))", gap: "1.25rem" }}>
             {[
-              { icon: <Zap size={22} color="var(--color-primary)" />, bg: "rgba(99,102,241,0.1)", title: "1. Paste URL", desc: "Drop any YouTube link into the input box." },
+              { icon: <Zap size={22} color="var(--color-primary)" />, bg: "rgba(255,69,58,0.1)", title: "1. Paste URL", desc: "Drop any YouTube link into the input box." },
               { icon: <BookOpen size={22} color="var(--color-success)" />, bg: "rgba(34,197,94,0.1)", title: "2. Get Summary", desc: "Our AI reads the transcript and generates structured notes." },
-              { icon: <Clock size={22} color="var(--color-accent)" />, bg: "rgba(167,139,250,0.1)", title: "3. Study & Export", desc: "Review timestamps, take the quiz, and export your notes." },
+              { icon: <Clock size={22} color="var(--color-accent)" />, bg: "rgba(255,105,97,0.1)", title: "3. Study & Export", desc: "Review timestamps, take the quiz, and export your notes." },
             ].map(({ icon, bg, title, desc }) => (
               <div key={title} className="section-card" style={{ display: "flex", flexDirection: "column", gap: "0.875rem" }}>
                 <div style={{ width: 46, height: 46, borderRadius: 12, background: bg, display: "flex", alignItems: "center", justifyContent: "center" }}>

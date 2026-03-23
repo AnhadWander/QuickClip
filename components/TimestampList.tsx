@@ -54,7 +54,7 @@ export default function TimestampList({ timestamps, videoUrl }: Props) {
           style={{
             padding: "0.35rem",
             borderRadius: 8,
-            background: "rgba(99,102,241,0.12)",
+            background: "rgba(255,69,58,0.12)",
           }}
         >
           <Clock size={16} color="var(--color-primary)" />
@@ -95,8 +95,8 @@ export default function TimestampList({ timestamps, videoUrl }: Props) {
               }}
               onMouseEnter={(e) => {
                 const el = e.currentTarget as HTMLAnchorElement;
-                el.style.borderColor = "rgba(99,102,241,0.5)";
-                el.style.background = "rgba(99,102,241,0.06)";
+                el.style.borderColor = "rgba(255,69,58,0.5)";
+                el.style.background = "rgba(255,69,58,0.06)";
                 el.style.transform = "translateX(4px)";
               }}
               onMouseLeave={(e) => {
