@@ -10,7 +10,10 @@ import type { SummaryResult } from "@/lib/types";
 import ReactMarkdown from "react-markdown";
 import { ExternalLink, BookOpen, Clock } from "lucide-react";
 
-
+/**
+ * Props:
+ * - result: contains all summary data (title, thumbnail, summary, etc.)
+ */
 interface Props {
   result: SummaryResult;
 }
@@ -22,15 +25,32 @@ export default function SummaryCard({ result }: Props) {
     detailed: "#a78bfa",
   };
 
+  /**
+   * Calculates estimated reading time based on word count
+   * Assumes average reading speed of 200 words per minute
+   */
   const wordCount = result.overallSummary.trim().split(/\s+/).length;
   const readingTimeMinutes = Math.ceil(wordCount / 200);
-  const readingTimeText = readingTimeMinutes < 1 ? "< 1 min read" : `~${readingTimeMinutes} min read`;
+
+  // Formats reading time text for display
+  const readingTimeText =
+    readingTimeMinutes < 1 ? "< 1 min read" : `~${readingTimeMinutes} min read`;
 
   return (
     <div className="flex flex-col gap-5">
       <div className="section-card fade-in-up flex gap-5 items-start flex-wrap">
         {result.thumbnailUrl && (
-          <div style={{ position: "relative", width: 180, height: 101, flexShrink: 0, borderRadius: 10, overflow: "hidden", border: "1px solid var(--color-border)" }}>
+          <div
+            style={{
+              position: "relative",
+              width: 180,
+              height: 101,
+              flexShrink: 0,
+              borderRadius: 10,
+              overflow: "hidden",
+              border: "1px solid var(--color-border)",
+            }}
+          >
             <Image
               src={result.thumbnailUrl}
               alt={result.videoTitle}
@@ -56,19 +76,39 @@ export default function SummaryCard({ result }: Props) {
             >
               {result.summaryLength}
             </span>
-            
-           <span style={{ display: "flex", alignItems: "center", gap: "0.3rem", fontSize: "0.82rem", color: "var(--color-text-muted)" }}>
-            <Clock size={13} />
-            {readingTimeText}
-              </span>
+
+            <span
+              style={{
+                display: "flex",
+                alignItems: "center",
+                gap: "0.3rem",
+                fontSize: "0.82rem",
+                color: "var(--color-text-muted)",
+              }}
+            >
+              <Clock size={13} />
+              {readingTimeText}
+            </span>
 
             <a
               href={result.videoUrl}
               target="_blank"
               rel="noopener noreferrer"
-              style={{ display: "flex", alignItems: "center", gap: "0.3rem", color: "var(--color-text-muted)", fontSize: "0.82rem", textDecoration: "none", transition: "color 0.2s" }}
-              onMouseEnter={(e) => (e.currentTarget.style.color = "var(--color-accent)")}
-              onMouseLeave={(e) => (e.currentTarget.style.color = "var(--color-text-muted)")}
+              style={{
+                display: "flex",
+                alignItems: "center",
+                gap: "0.3rem",
+                color: "var(--color-text-muted)",
+                fontSize: "0.82rem",
+                textDecoration: "none",
+                transition: "color 0.2s",
+              }}
+              onMouseEnter={(e) =>
+                (e.currentTarget.style.color = "var(--color-accent)")
+              }
+              onMouseLeave={(e) =>
+                (e.currentTarget.style.color = "var(--color-text-muted)")
+              }
             >
               <ExternalLink size={13} />
               Watch on YouTube
@@ -76,7 +116,6 @@ export default function SummaryCard({ result }: Props) {
           </div>
         </div>
       </div>
-
 
       <div className="section-card fade-in-up fade-in-up-delay-1">
         <div className="flex items-center gap-[0.6rem] mb-4">
@@ -87,7 +126,14 @@ export default function SummaryCard({ result }: Props) {
             Summary
           </h3>
         </div>
-        <div className="markdown-content" style={{ color: "var(--color-text)", lineHeight: 1.8, fontSize: "0.97rem" }}>
+        <div
+          className="markdown-content"
+          style={{
+            color: "var(--color-text)",
+            lineHeight: 1.8,
+            fontSize: "0.97rem",
+          }}
+        >
           <ReactMarkdown>{result.overallSummary}</ReactMarkdown>
         </div>
       </div>
